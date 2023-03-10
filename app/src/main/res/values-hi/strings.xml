@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">गीता ज्ञान</string>
+    <string name="slok_number">श्लोक %s</string>
+    <string name="chapter_number_with_sanksrit">%1s. %2s</string>
+    <string name="chapters">अध्याय</string>
+    <string name="chapter_number">अध्याय %s</string>
+    <string name="okay_lets_go">जारी रखें</string>
+    <string name="choose_your_preferred_language">अपनी पसंदीदा भाषा चुनें</string>
+</resources>
