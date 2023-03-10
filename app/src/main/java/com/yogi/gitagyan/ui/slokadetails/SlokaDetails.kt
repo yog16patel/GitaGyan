@@ -12,8 +12,12 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -37,6 +41,8 @@ import com.yogi.gitagyan.ui.theme.Saffron
 import com.yogi.gitagyan.ui.theme.SlokaBackgroud
 import com.yogi.gitagyan.ui.viewmodels.GitaGyanViewModel
 import com.yogi.gitagyan.R
+import com.yogi.gitagyan.commonui.GitaLinearProgressBar
+import com.yogi.gitagyan.commonui.GitaProgressbarState
 import com.yogi.gitagyan.ui.appbar.AppbarState
 import com.yogi.gitagyan.ui.model.PreferredLanguage
 import com.yogi.gitagyan.ui.theme.Dimensions.gitaPadding6x
@@ -48,17 +54,36 @@ fun SlokaDetails(
     viewModel: GitaGyanViewModel,
     onComposing: (AppbarState) -> Unit
 ) {
-    val pagestate = rememberPagerState()
+    val pagerState = rememberPagerState()
     val coroutineScope = rememberCoroutineScope()
     val slokaDetailsPageState = viewModel.slokaDetailsPageState.collectAsState()
     val appState = viewModel.languageState.collectAsState()
     val chapterInfo = slokaDetailsPageState.value.chapterInfoItems
     val list = chapterInfo?.slokas ?: emptyList()
+    val listSize = if (list.isNotEmpty()) list.size else 1
+
+    var progressbarState by remember {
+        mutableStateOf(GitaProgressbarState())
+    }
+    var currentItem by remember {
+        mutableStateOf(1)
+    }
+
+    progressbarState = progressbarState.copy(
+        currentItem = currentItem.toFloat(),
+        totalItem = listSize.toFloat()
+    )
 
     val title = stringResource(
         id = R.string.chapter_number,
         chapterInfo?.chapter_number ?: ""
     )
+
+    LaunchedEffect(key1 = pagerState) {
+        snapshotFlow { pagerState.currentPage }.collect {
+            currentItem = it + 1
+        }
+    }
 
     LaunchedEffect(key1 = title) {
         mutableStateOf(
@@ -70,32 +95,37 @@ fun SlokaDetails(
             )
         )
     }
-
-    HorizontalPager(
-        pageCount = list.size,
-        state = pagestate
-    ) {
-        val sloka = list[it]
-        SlokaComposable(
-            slokaNumber = sloka.number,
-            currentPage = pagestate.currentPage,
-            lastSlokaNumber = list.size,
-            sanskritSloka = sloka.sanskrit,
-            sloka = if (appState.value.preferredLanguage == PreferredLanguage.ENGLISH) sloka.translations.EN
-            else sloka.translations.HN,
-            previousClicked = {
-                coroutineScope.launch {
-                    if (pagestate.currentPage > 0)
-                        pagestate.animateScrollToPage(pagestate.currentPage - 1)
-                }
-            },
-            nextClicked = {
-                coroutineScope.launch {
-                    if (pagestate.currentPage < list.size - 1)
-                        pagestate.animateScrollToPage(pagestate.currentPage + 1)
-                }
-            }
+    Column {
+        GitaLinearProgressBar(
+            progressbarState = progressbarState
         )
+
+        HorizontalPager(
+            pageCount = list.size,
+            state = pagerState
+        ) { page ->
+            val sloka = list[page]
+            SlokaComposable(
+                slokaNumber = sloka.number,
+                currentPage = pagerState.currentPage,
+                lastSlokaNumber = list.size,
+                sanskritSloka = sloka.sanskrit,
+                sloka = if (appState.value.preferredLanguage == PreferredLanguage.ENGLISH) sloka.translations.EN
+                else sloka.translations.HN,
+                previousClicked = {
+                    coroutineScope.launch {
+                        if (pagerState.currentPage > 0)
+                            pagerState.animateScrollToPage(pagerState.currentPage - 1)
+                    }
+                },
+                nextClicked = {
+                    coroutineScope.launch {
+                        if (pagerState.currentPage < list.size - 1)
+                            pagerState.animateScrollToPage(pagerState.currentPage + 1)
+                    }
+                }
+            )
+        }
     }
 }
 
