@@ -60,7 +60,7 @@ fun SlokaDetails(
         chapterInfo?.chapter_number ?: ""
     )
 
-    LaunchedEffect(key1 = true) {
+    LaunchedEffect(key1 = title) {
         mutableStateOf(
             onComposing(
                 AppbarState(
@@ -70,7 +70,6 @@ fun SlokaDetails(
             )
         )
     }
-
 
     HorizontalPager(
         pageCount = list.size,
