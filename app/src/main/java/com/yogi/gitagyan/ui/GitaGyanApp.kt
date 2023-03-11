@@ -51,8 +51,17 @@ fun GitaGyanApp(
         Box(modifier = Modifier.padding(innerPadding)) {
             NavHost(
                 navController = appState.navController,
-                startDestination = Screen.ChapterList.route
+                startDestination = Screen.SplashScreen.route
             ) {
+                composable(Screen.SplashScreen.route){ backStackEntry ->
+                    SplashScreen{
+                        appState.navigateToChapterList(backStackEntry){
+                            popUpTo(Screen.SplashScreen.route){
+                                inclusive = true
+                            }
+                        }
+                    }
+                }
                 composable(Screen.ChapterList.route) { backStackEntry ->
                     ChapterList(
                         viewModel = viewModel,

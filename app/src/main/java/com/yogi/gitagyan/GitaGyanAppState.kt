@@ -5,12 +5,13 @@ import androidx.compose.runtime.remember
 import androidx.lifecycle.Lifecycle
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavHostController
+import androidx.navigation.NavOptionsBuilder
 import androidx.navigation.compose.rememberNavController
-import com.google.firebase.ktx.Firebase
 
 
 sealed class Screen(val route: String) {
-    object ChapterList : Screen("chapterlist")
+    object SplashScreen: Screen("splash_screen")
+    object ChapterList : Screen("chapter_list_screen")
     object ChapterDetails : Screen("chapter_details/{chapter_number}") {
         fun createRoute(chapter_number: String) = "chapter_details/$chapter_number"
     }
@@ -26,7 +27,15 @@ fun rememberGitaGyanAppState(
 class GitaGyanAppState(
     val navController: NavHostController
 ) {
-    
+
+    fun navigateToChapterList(from: NavBackStackEntry,builder: NavOptionsBuilder.() -> Unit = {  } ){
+        if(from.lifecycleIsResumed()){
+            navController.navigate(Screen.ChapterList.route,){
+                builder.invoke(this)
+            }
+        }
+    }
+
     fun navigateToChapterDetails(chapterNumber: String, from: NavBackStackEntry) {
         // In order to discard duplicated navigation events, we check the Lifecycle
         if (from.lifecycleIsResumed()) {

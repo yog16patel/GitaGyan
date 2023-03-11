@@ -1,5 +1,7 @@
 <resources>
     <string name="app_name">Gita Gyan</string>
+    <string name="splash_title_name">Shrimad \nBhagvat Gita</string>
+    <string name="splash_slogan">Helps you to live better.</string>
     <string name="slok_number">Slok %s</string>
     <string name="chapter_number_with_sanksrit">%1s. %2s</string>
     <string name="chapter_number">CHAPTER %s</string>
