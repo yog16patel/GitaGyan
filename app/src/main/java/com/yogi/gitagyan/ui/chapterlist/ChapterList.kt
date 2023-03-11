@@ -34,6 +34,7 @@ import com.yogi.gitagyan.ui.viewmodels.GitaGyanViewModel
 import com.yogi.gitagyan.R
 import com.yogi.gitagyan.commonui.ChooseLanguageDialog
 import com.yogi.gitagyan.commonui.GitaAlertDialogNew
+import com.yogi.gitagyan.commonui.ImageBorderAnimation
 import com.yogi.gitagyan.ui.appbar.AppbarState
 import com.yogi.gitagyan.ui.model.PreferredLanguage.ENGLISH
 import com.yogi.gitagyan.ui.model.PreferredLanguage
@@ -45,8 +46,11 @@ fun ChapterList(
     onComposing: (AppbarState) -> Unit,
     navigateToSlokaComposable: (Int) -> Unit
 ) {
-    val chaptersState = viewModel.chapterListPageState.collectAsState()
-    val chapterListPageState = chaptersState.value
+    val chaptersState by viewModel.chapterListPageState.collectAsState()
+
+    if(chaptersState.isLoading) ImageBorderAnimation()
+
+    val chapterListPageState = chaptersState
     var showDialog by remember {
         mutableStateOf(false)
     }
@@ -148,7 +152,7 @@ fun ChapterItem(
                     chapter.translations.SN
                 ),
                 fontWeight = FontWeight.SemiBold,
-                fontSize = 20.sp,
+                fontSize = 18.sp,
                 color = TextWhite,
                 modifier = Modifier
                     .padding(
@@ -159,7 +163,7 @@ fun ChapterItem(
                 text = if (preferredLanguage == ENGLISH) chapter.translations.EN
                 else chapter.translations.HN,
                 fontWeight = FontWeight.Normal,
-                fontSize = 15.sp,
+                fontSize = 13.sp,
                 color = TextWhite,
                 modifier = Modifier
                     .padding(

@@ -3,5 +3,6 @@ package com.yogi.gitagyan.ui.slokadetails
 import com.yogi.domain.model.SlokaDetailItem
 
 data class SlokaDetailsPageState(
-    val chapterInfoItems: SlokaDetailItem? = null
+    val chapterInfoItems: SlokaDetailItem? = null,
+    val isLoading:Boolean = false
 )

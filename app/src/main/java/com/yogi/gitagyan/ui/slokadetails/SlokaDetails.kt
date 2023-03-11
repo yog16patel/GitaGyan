@@ -43,6 +43,7 @@ import com.yogi.gitagyan.ui.viewmodels.GitaGyanViewModel
 import com.yogi.gitagyan.R
 import com.yogi.gitagyan.commonui.GitaLinearProgressBar
 import com.yogi.gitagyan.commonui.GitaProgressbarState
+import com.yogi.gitagyan.commonui.ImageBorderAnimation
 import com.yogi.gitagyan.ui.appbar.AppbarState
 import com.yogi.gitagyan.ui.model.PreferredLanguage
 import com.yogi.gitagyan.ui.theme.Dimensions.gitaPadding6x
@@ -54,77 +55,80 @@ fun SlokaDetails(
     viewModel: GitaGyanViewModel,
     onComposing: (AppbarState) -> Unit
 ) {
-    val pagerState = rememberPagerState()
-    val coroutineScope = rememberCoroutineScope()
-    val slokaDetailsPageState = viewModel.slokaDetailsPageState.collectAsState()
-    val appState = viewModel.languageState.collectAsState()
-    val chapterInfo = slokaDetailsPageState.value.chapterInfoItems
-    val list = chapterInfo?.slokas ?: emptyList()
-    val listSize = if (list.isNotEmpty()) list.size else 1
+    val slokaDetailsPageState by viewModel.slokaDetailsPageState.collectAsState()
+    if (slokaDetailsPageState.isLoading) ImageBorderAnimation()
+    else {
+        val pagerState = rememberPagerState()
+        val coroutineScope = rememberCoroutineScope()
+        val appState = viewModel.languageState.collectAsState()
+        val chapterInfo = slokaDetailsPageState.chapterInfoItems
+        val list = chapterInfo?.slokas ?: emptyList()
+        val listSize = if (list.isNotEmpty()) list.size else 1
 
-    var progressbarState by remember {
-        mutableStateOf(GitaProgressbarState())
-    }
-    var currentItem by remember {
-        mutableStateOf(1)
-    }
-
-    progressbarState = progressbarState.copy(
-        currentItem = currentItem.toFloat(),
-        totalItem = listSize.toFloat()
-    )
-
-    val title = stringResource(
-        id = R.string.chapter_number,
-        chapterInfo?.chapter_number ?: ""
-    )
-
-    LaunchedEffect(key1 = pagerState) {
-        snapshotFlow { pagerState.currentPage }.collect {
-            currentItem = it + 1
+        var progressbarState by remember {
+            mutableStateOf(GitaProgressbarState())
         }
-    }
+        var currentItem by remember {
+            mutableStateOf(1)
+        }
 
-    LaunchedEffect(key1 = title) {
-        mutableStateOf(
-            onComposing(
-                AppbarState(
-                    title = title,
-                    action = null
+        progressbarState = progressbarState.copy(
+            currentItem = currentItem.toFloat(),
+            totalItem = listSize.toFloat()
+        )
+
+        val title = stringResource(
+            id = R.string.chapter_number,
+            chapterInfo?.chapter_number ?: ""
+        )
+
+        LaunchedEffect(key1 = pagerState) {
+            snapshotFlow { pagerState.currentPage }.collect {
+                currentItem = it + 1
+            }
+        }
+
+        LaunchedEffect(key1 = title) {
+            mutableStateOf(
+                onComposing(
+                    AppbarState(
+                        title = title,
+                        action = null
+                    )
                 )
             )
-        )
-    }
-    Column {
-        GitaLinearProgressBar(
-            progressbarState = progressbarState
-        )
-
-        HorizontalPager(
-            pageCount = list.size,
-            state = pagerState
-        ) { page ->
-            val sloka = list[page]
-            SlokaComposable(
-                slokaNumber = sloka.number,
-                currentPage = pagerState.currentPage,
-                lastSlokaNumber = list.size,
-                sanskritSloka = sloka.sanskrit,
-                sloka = if (appState.value.preferredLanguage == PreferredLanguage.ENGLISH) sloka.translations.EN
-                else sloka.translations.HN,
-                previousClicked = {
-                    coroutineScope.launch {
-                        if (pagerState.currentPage > 0)
-                            pagerState.animateScrollToPage(pagerState.currentPage - 1)
-                    }
-                },
-                nextClicked = {
-                    coroutineScope.launch {
-                        if (pagerState.currentPage < list.size - 1)
-                            pagerState.animateScrollToPage(pagerState.currentPage + 1)
-                    }
-                }
+        }
+        Column {
+            GitaLinearProgressBar(
+                progressbarState = progressbarState
             )
+
+            HorizontalPager(
+                pageCount = list.size,
+                state = pagerState
+            ) { page ->
+                val sloka = list[page]
+                SlokaComposable(
+                    slokaNumber = sloka.number,
+                    currentPage = pagerState.currentPage,
+                    lastSlokaNumber = list.size,
+                    sanskritSloka = sloka.sanskrit,
+                    sloka = if (appState.value.preferredLanguage == PreferredLanguage.ENGLISH) sloka.translations.EN
+                    else sloka.translations.HN,
+                    previousClicked = {
+                        coroutineScope.launch {
+                            if (pagerState.currentPage > 0)
+                                pagerState.animateScrollToPage(pagerState.currentPage - 1)
+                        }
+                    },
+                    nextClicked = {
+                        coroutineScope.launch {
+                            if (pagerState.currentPage < list.size - 1)
+                                pagerState.animateScrollToPage(pagerState.currentPage + 1)
+                        }
+                    }
+                )
+            }
         }
     }
 }

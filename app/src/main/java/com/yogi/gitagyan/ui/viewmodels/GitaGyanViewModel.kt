@@ -16,6 +16,7 @@ import com.yogi.gitagyan.ui.model.PreferredLanguage
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -24,18 +25,18 @@ class GitaGyanViewModel @Inject constructor(
     private val getChapterListInteractor: GetChapterListInteractor,
     private val getSlokaDetailsInteractor: GetSlokaDetailsInteractor,
     private val sharedPreferencesRepository: SharedPreferencesRepository
-): ViewModel() {
+) : ViewModel() {
 
-    private val _chapterListPageState = MutableStateFlow(ChapterListPageState())
+    private val _chapterListPageState = MutableStateFlow(ChapterListPageState(isLoading = true))
     val chapterListPageState: StateFlow<ChapterListPageState>
         get() = _chapterListPageState
 
-    private val _slokaDetailsPageState = MutableStateFlow(SlokaDetailsPageState())
+    private val _slokaDetailsPageState = MutableStateFlow(SlokaDetailsPageState(isLoading = true))
     val slokaDetailsPageState: StateFlow<SlokaDetailsPageState>
         get() = _slokaDetailsPageState
 
     private val _languageState = MutableStateFlow(LanguageState())
-    val languageState : StateFlow<LanguageState>
+    val languageState: StateFlow<LanguageState>
         get() = _languageState
 
     init {
@@ -43,42 +44,55 @@ class GitaGyanViewModel @Inject constructor(
     }
 
     private fun getChapterList() {
+        _chapterListPageState.update {
+            it.copy(
+                isLoading = false
+            )
+        }
         viewModelScope.launch {
-            when(val response = getChapterListInteractor.executeSync(Unit)){
-                is Result.Success -> _chapterListPageState.value = ChapterListPageState(response.data)
-                is Result.Error -> Log.e("Yogesh","ERROR: ${response.exception}")
+            when (val response = getChapterListInteractor.executeSync(Unit)) {
+                is Result.Success -> {
+                    _chapterListPageState.update {
+                        it.copy(
+                            chapterInfoItems = response.data,
+                            isLoading = false
+                        )
+                    }
+                }
+
+                is Result.Error -> Log.e("Yogesh", "ERROR: ${response.exception}")
             }
         }
     }
 
-    fun getSlokaDetails(chapteNumber: Int){
-        Log.e("Yogesh","selected chapter is : $chapteNumber")
+    fun getSlokaDetails(chapterNumber: Int) {
+        _slokaDetailsPageState.update {
+            it.copy(isLoading = true)
+        }
         viewModelScope.launch {
-            when(val response = getSlokaDetailsInteractor.executeSync(chapteNumber)){
-                is Result.Success -> _slokaDetailsPageState.value = SlokaDetailsPageState(response.data)
-                is Result.Error ->  Log.e("Yogesh","ERROR: ${response.exception}")
+            when (val response = getSlokaDetailsInteractor.executeSync(chapterNumber)) {
+                is Result.Success -> {
+                    _slokaDetailsPageState.update {
+                        it.copy(isLoading = false, chapterInfoItems = response.data)
+                    }
+                }
+
+                is Result.Error -> Log.e("Yogesh", "ERROR: ${response.exception}")
                 else -> {
-                    Log.e("Yogesh","ERROR: in else branch..")
+                    Log.e("Yogesh", "ERROR: in else branch..")
                 }
             }
 
         }
     }
 
-    fun setLanguagePreferences(preferredLanguage: PreferredLanguage){
+    fun setLanguagePreferences(preferredLanguage: PreferredLanguage) {
         _languageState.value = _languageState.value.copy(preferredLanguage = preferredLanguage)
-        sharedPreferencesRepository.saveValueSharedPreferences("Language", preferredLanguage.languageCode)
+        sharedPreferencesRepository.saveValueSharedPreferences(
+            "Language",
+            preferredLanguage.languageCode
+        )
         LanguageChangeUtil.applyLanguage(preferredLanguage.languageCode)
     }
-
-    fun getLanguagePreference(){
-        val savedLanguage = sharedPreferencesRepository.getSharedPreferencesValues("Language")
-        savedLanguage?.let {
-            val preferredLanguage = PreferredLanguage.valueToEnum(savedLanguage)
-            _languageState.value.copy(preferredLanguage = preferredLanguage)
-        }
-    }
-
-    fun getSetLanguageCode(): String = languageMap[_languageState.value.preferredLanguage] ?: "en"
 
 }
