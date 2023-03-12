@@ -29,8 +29,9 @@ fun List<ChapterInfoItem>.toChapterInfoItemUiList() =
 
 
 
-fun ChapterDetailItem.toChapterDetailItemUi(description: String) = ChapterDetailItemUi(
+fun ChapterDetailItem.toChapterDetailItemUi(title:String, description: String) = ChapterDetailItemUi(
     chapterNumber = chapterNumber,
+    chapterTitle = title,
     description = description,
     slokUiEntityList = slokEntityList.map {
         it.toSlokUi()

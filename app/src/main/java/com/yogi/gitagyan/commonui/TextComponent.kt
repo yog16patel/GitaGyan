@@ -38,7 +38,8 @@ fun TextComponentDevnagri(
     fontWeight : FontWeight = FontWeight.Normal,
     fontSize : TextUnit = TextUnit.Unspecified,
     textAlign : TextAlign = TextAlign.Left,
-    lineHeight : TextUnit = TextUnit.Unspecified
+    lineHeight : TextUnit = TextUnit.Unspecified,
+    maxLines: Int = Int.MAX_VALUE
 ) {
     Text(
         text = text,
@@ -48,6 +49,7 @@ fun TextComponentDevnagri(
         fontSize = fontSize,
         fontWeight = fontWeight,
         textAlign = textAlign,
-        lineHeight = lineHeight
+        lineHeight = lineHeight,
+        maxLines = maxLines
     )
 }

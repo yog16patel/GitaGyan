@@ -23,7 +23,7 @@ import com.yogi.gitagyan.ui.theme.Dimensions
 import com.yogi.gitagyan.ui.theme.Saffron
 
 @Composable
-fun ChooseLanguageDialog(
+fun ChooseLanguageDialogUi(
     items: Array<String>,
     defaultSelectedIem: String,
     onDismissDialog: (Int) -> Unit

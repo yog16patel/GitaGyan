@@ -32,7 +32,7 @@ import com.yogi.gitagyan.ui.theme.Saffron
 import com.yogi.gitagyan.ui.theme.TextWhite
 import com.yogi.gitagyan.ui.viewmodels.GitaGyanViewModel
 import com.yogi.gitagyan.R
-import com.yogi.gitagyan.commonui.ChooseLanguageDialog
+import com.yogi.gitagyan.commonui.ChooseLanguageDialogUi
 import com.yogi.gitagyan.commonui.GitaAlertDialogNew
 import com.yogi.gitagyan.commonui.ImageBorderAnimation
 import com.yogi.gitagyan.ui.appbar.AppbarState
@@ -44,7 +44,7 @@ import com.yogi.gitagyan.ui.theme.Black
 fun ChapterList(
     viewModel: GitaGyanViewModel,
     onComposing: (AppbarState) -> Unit,
-    navigateToSlokaComposable: (Int) -> Unit
+    navigateToSlokaOverview: (Int) -> Unit
 ) {
     val chaptersState by viewModel.chapterListPageState.collectAsState()
 
@@ -62,7 +62,7 @@ fun ChapterList(
         val languageState = viewModel.languageState.collectAsState()
         if (showDialog) {
             GitaAlertDialogNew(dialogOpen = true) {
-                ChooseLanguageDialog(
+                ChooseLanguageDialogUi(
                     items = languageArray,
                     defaultSelectedIem = defaultSelectedIem,
                     onDismissDialog = {
@@ -120,14 +120,13 @@ fun ChapterList(
                             .clickable {
                                 val chapterNumber = chapter.chapterNumber.toInt()
                                 viewModel.getSlokaDetails(chapterNumber = chapterNumber)
-                                navigateToSlokaComposable(chapterNumber)
+                                navigateToSlokaOverview(chapterNumber)
                             }
                             .padding(
                                 vertical = Dimensions.gitaPadding,
                                 horizontal = Dimensions.gitaPadding2x
                             ),
-                        chapter = chapter,
-                        preferredLanguage = appState.value.preferredLanguage
+                        chapter = chapter
                     )
                 }
             }
@@ -139,8 +138,7 @@ fun ChapterList(
 @Composable
 fun ChapterItem(
     modifier: Modifier,
-    chapter: ChapterInfoItemUi,
-    preferredLanguage: PreferredLanguage
+    chapter: ChapterInfoItemUi
 ) {
     Box(
         modifier = modifier

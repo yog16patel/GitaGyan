@@ -20,6 +20,7 @@ import com.yogi.gitagyan.commonui.GitaTopAppBar
 import com.yogi.gitagyan.rememberGitaGyanAppState
 import com.yogi.gitagyan.ui.appbar.AppbarState
 import com.yogi.gitagyan.ui.chapterlist.ChapterList
+import com.yogi.gitagyan.ui.slokadetails.ChapterOverview
 import com.yogi.gitagyan.ui.slokadetails.SlokaDetails
 import com.yogi.gitagyan.ui.viewmodels.GitaGyanViewModel
 
@@ -65,15 +66,26 @@ fun GitaGyanApp(
                 composable(Screen.ChapterList.route) { backStackEntry ->
                     ChapterList(
                         viewModel = viewModel,
-                        navigateToSlokaComposable = { chapterNumber ->
-                            appState.navigateToChapterDetails(
-                                chapterNumber.toString(),
-                                backStackEntry
-                            )
+                        navigateToSlokaOverview = { _ ->
+                            appState.navigateChapterOverview(backStackEntry)
                         },
                         onComposing = {
                             appBarState = it
                         }
+                    )
+                }
+                composable(Screen.ChapterOverview.route){ backStackEntry ->
+                    ChapterOverview(
+                        viewModel = viewModel,
+                        onComposing = {
+                        appBarState = it
+                    },
+                        navigateToSlokaDeails = {
+                            appState.navigateToChapterDetails(
+                                backStackEntry
+                            )
+
+                        },
                     )
                 }
                 composable(Screen.ChapterDetails.route) {

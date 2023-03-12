@@ -4,6 +4,7 @@ import androidx.compose.ui.graphics.Color
 
 val Background = Color(0xFFFFFFFF)
 val Saffron = Color(0xFFFC7600)
+val LightSaffron = Color(0xFFFFC99A)
 val Black = Color(0xFF000000)
 val Gray = Color(0xFF484848)
 val GrayHint = Color(0xFFC7D0E0)

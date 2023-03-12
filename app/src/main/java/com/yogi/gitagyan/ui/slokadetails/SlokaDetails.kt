@@ -59,8 +59,7 @@ fun SlokaDetails(
     else {
         val pagerState = rememberPagerState()
         val coroutineScope = rememberCoroutineScope()
-        val appState = viewModel.languageState.collectAsState()
-        val chapterInfo = slokaDetailsPageState.chapterInfoItems
+        val chapterInfo = slokaDetailsPageState.chapterDetailsItems
         val list = chapterInfo?.slokUiEntityList ?: emptyList()
         val listSize = if (list.isNotEmpty()) list.size else 1
 
@@ -76,18 +75,21 @@ fun SlokaDetails(
             totalItem = listSize.toFloat()
         )
 
+
         val title = stringResource(
             id = R.string.chapter_number,
             chapterInfo?.chapterNumber ?: ""
         )
 
         LaunchedEffect(key1 = pagerState) {
+
             snapshotFlow { pagerState.currentPage }.collect {
                 currentItem = it + 1
             }
         }
 
         LaunchedEffect(key1 = title) {
+            pagerState.animateScrollToPage(slokaDetailsPageState.lastSelectedSloka)
             mutableStateOf(
                 onComposing(
                     AppbarState(

@@ -5,5 +5,6 @@ import androidx.compose.runtime.Composable
 
 data class AppbarState(
     val title: String = "",
+    val shouldShow:Boolean = false,
     val action: (@Composable RowScope.()->Unit)? = null
 )

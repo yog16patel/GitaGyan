@@ -74,8 +74,17 @@ class GitaGyanViewModel @Inject constructor(
             when (val response = getSlokaDetailsInteractor.executeSync(chapterNumber)) {
                 is Result.Success -> {
                     _slokaDetailsPageState.update {
-                        val description = chapterListPageState.value.chapterInfoItems[chapterNumber].description
-                        it.copy(isLoading = false, chapterInfoItems = response.data?.toChapterDetailItemUi(description))
+                        val description =
+                            chapterListPageState.value.chapterInfoItems[chapterNumber - 1].description
+                        val title =
+                            chapterListPageState.value.chapterInfoItems[chapterNumber - 1].translation
+                        it.copy(
+                            isLoading = false,
+                            chapterDetailsItems = response.data?.toChapterDetailItemUi(
+                                title,
+                                description
+                            )
+                        )
                     }
                 }
 
@@ -93,7 +102,8 @@ class GitaGyanViewModel @Inject constructor(
         sharedPreferencesRepository.saveLanguageToSharedPref(preferredLanguage)
         getChapterList()
     }
-    fun getLanguagePreference(){
+
+    fun getLanguagePreference() {
         val savedLanguage = sharedPreferencesRepository.getLanguageFromSharedPref()
         savedLanguage?.let {
             _languageState.value.copy(preferredLanguage = savedLanguage)

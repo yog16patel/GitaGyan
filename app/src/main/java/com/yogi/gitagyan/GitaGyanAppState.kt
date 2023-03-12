@@ -12,9 +12,8 @@ import androidx.navigation.compose.rememberNavController
 sealed class Screen(val route: String) {
     object SplashScreen: Screen("splash_screen")
     object ChapterList : Screen("chapter_list_screen")
-    object ChapterDetails : Screen("chapter_details/{chapter_number}") {
-        fun createRoute(chapter_number: String) = "chapter_details/$chapter_number"
-    }
+    object ChapterOverview : Screen("chapter_overview")
+    object ChapterDetails : Screen("chapter_details/")
 }
 
 @Composable
@@ -36,10 +35,17 @@ class GitaGyanAppState(
         }
     }
 
-    fun navigateToChapterDetails(chapterNumber: String, from: NavBackStackEntry) {
+    fun navigateChapterOverview(from: NavBackStackEntry){
+        if(from.lifecycleIsResumed()){
+            navController.navigate(Screen.ChapterOverview.route)
+        }
+
+    }
+
+    fun navigateToChapterDetails(from: NavBackStackEntry) {
         // In order to discard duplicated navigation events, we check the Lifecycle
         if (from.lifecycleIsResumed()) {
-            navController.navigate(Screen.ChapterDetails.createRoute(chapterNumber))
+            navController.navigate(Screen.ChapterDetails.route)
         }
     }
 
