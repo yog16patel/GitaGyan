@@ -1,5 +1,6 @@
 package com.yogi.gitagyan.ui.chapterlist
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -24,7 +25,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.yogi.domain.model.ChapterInfoItem
 import com.yogi.gitagyan.commonui.TextComponent
 import com.yogi.gitagyan.ui.theme.Background
 import com.yogi.gitagyan.ui.theme.Dimensions
@@ -36,8 +36,8 @@ import com.yogi.gitagyan.commonui.ChooseLanguageDialog
 import com.yogi.gitagyan.commonui.GitaAlertDialogNew
 import com.yogi.gitagyan.commonui.ImageBorderAnimation
 import com.yogi.gitagyan.ui.appbar.AppbarState
-import com.yogi.gitagyan.ui.model.PreferredLanguage.ENGLISH
-import com.yogi.gitagyan.ui.model.PreferredLanguage
+import com.yogi.domain.entities.PreferredLanguage
+import com.yogi.gitagyan.models.ChapterInfoItemUi
 import com.yogi.gitagyan.ui.theme.Black
 
 @Composable
@@ -48,86 +48,98 @@ fun ChapterList(
 ) {
     val chaptersState by viewModel.chapterListPageState.collectAsState()
 
-    if(chaptersState.isLoading) ImageBorderAnimation()
+    if (chaptersState.isLoading) ImageBorderAnimation()
+    else {
 
-    val chapterListPageState = chaptersState
-    var showDialog by remember {
-        mutableStateOf(false)
-    }
-    val languageArray: Array<String> = stringArrayResource(id = R.array.language_array)
-
-    val appState = viewModel.languageState.collectAsState()
-    val defaultSelectedIem = languageArray[appState.value.preferredLanguage.index]
-    if (showDialog) {
-        GitaAlertDialogNew(dialogOpen = true) {
-            ChooseLanguageDialog(
-                items = languageArray,
-                defaultSelectedIem = defaultSelectedIem,
-                onDismissDialog = {
-                    val selection = PreferredLanguage.indexToEnum(it)
-                    viewModel.setLanguagePreferences(preferredLanguage = selection)
-                    showDialog = false
-                }
-            )
+        val chapterListPageState = chaptersState
+        var showDialog by remember {
+            mutableStateOf(false)
         }
-    }
-    val title = stringResource(id = R.string.chapters)
-    LaunchedEffect(key1 = true) {
-        onComposing(
-            AppbarState(
-                title = title,
-                action = {
-                    IconButton(
-                        modifier = Modifier
-                            .padding(end = Dimensions.gitaPadding2x)
-                            .size(24.dp),
-                        onClick = {
-                            showDialog = true
-                        }) {
-                        Icon(
-                            imageVector = Icons.Filled.Settings,
-                            contentDescription = "Back",
-                            tint = Black
+        val languageArray: Array<String> = stringArrayResource(id = R.array.language_array)
 
+        val appState = viewModel.languageState.collectAsState()
+        val defaultSelectedIem = languageArray[appState.value.preferredLanguage.index]
+        val languageState = viewModel.languageState.collectAsState()
+        if (showDialog) {
+            GitaAlertDialogNew(dialogOpen = true) {
+                ChooseLanguageDialog(
+                    items = languageArray,
+                    defaultSelectedIem = defaultSelectedIem,
+                    onDismissDialog = {
+                        val selection = PreferredLanguage.indexToEnum(it)
+                        Log.e(
+                            "Yogesh",
+                            "ChapterDetails.kt Selected Language : $selection and index : $it"
                         )
+                        viewModel.setLanguagePreferences(preferredLanguage = selection)
+                        showDialog = false
                     }
-                }
-            )
-        )
-    }
-
-    Column(
-        modifier = Modifier.background(Background)
-    ) {
-        LazyColumn {
-            items(chapterListPageState.chapterInfoItems.size) { i ->
-                val chapter = chapterListPageState.chapterInfoItems[i]
-
-                ChapterItem(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clickable {
-                            viewModel.getSlokaDetails(chapter.chapter_number)
-                            navigateToSlokaComposable(chapter.chapter_number)
-                        }
-                        .padding(
-                            vertical = Dimensions.gitaPadding,
-                            horizontal = Dimensions.gitaPadding2x
-                        ),
-                    chapter = chapter,
-                    preferredLanguage = appState.value.preferredLanguage
                 )
             }
         }
-    }
+        val title =
+            if (languageState.value.preferredLanguage == PreferredLanguage.ENGLISH) stringResource(
+                id = R.string.chapters
+            )
+            else stringResource(id = R.string.chapters_hindi)
 
+        LaunchedEffect(key1 = title) {
+            onComposing(
+                AppbarState(
+                    title = title,
+                    action = {
+                        IconButton(
+                            modifier = Modifier
+                                .padding(end = Dimensions.gitaPadding2x)
+                                .size(24.dp),
+                            onClick = {
+                                showDialog = true
+                            }) {
+                            Icon(
+                                imageVector = Icons.Filled.Settings,
+                                contentDescription = "Back",
+                                tint = Black
+
+                            )
+                        }
+                    }
+                )
+            )
+        }
+
+        Column(
+            modifier = Modifier.background(Background)
+        ) {
+            LazyColumn {
+                items(chapterListPageState.chapterInfoItems.size) { i ->
+                    val chapter = chapterListPageState.chapterInfoItems[i]
+
+                    ChapterItem(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable {
+                                val chapterNumber = chapter.chapterNumber.toInt()
+                                viewModel.getSlokaDetails(chapterNumber = chapterNumber)
+                                navigateToSlokaComposable(chapterNumber)
+                            }
+                            .padding(
+                                vertical = Dimensions.gitaPadding,
+                                horizontal = Dimensions.gitaPadding2x
+                            ),
+                        chapter = chapter,
+                        preferredLanguage = appState.value.preferredLanguage
+                    )
+                }
+            }
+        }
+    }
 }
 
 
 @Composable
 fun ChapterItem(
     modifier: Modifier,
-    chapter: ChapterInfoItem,
+    chapter: ChapterInfoItemUi,
     preferredLanguage: PreferredLanguage
 ) {
     Box(
@@ -148,8 +160,8 @@ fun ChapterItem(
             TextComponent(
                 text = stringResource(
                     id = R.string.chapter_number_with_sanksrit,
-                    chapter.chapter_number,
-                    chapter.translations.SN
+                    chapter.chapterNumber,
+                    chapter.name
                 ),
                 fontWeight = FontWeight.SemiBold,
                 fontSize = 18.sp,
@@ -160,8 +172,7 @@ fun ChapterItem(
                     ),
             )
             TextComponent(
-                text = if (preferredLanguage == ENGLISH) chapter.translations.EN
-                else chapter.translations.HN,
+                text = chapter.translation,
                 fontWeight = FontWeight.Normal,
                 fontSize = 13.sp,
                 color = TextWhite,

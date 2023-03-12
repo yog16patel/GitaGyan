@@ -45,7 +45,6 @@ import com.yogi.gitagyan.commonui.GitaLinearProgressBar
 import com.yogi.gitagyan.commonui.GitaProgressbarState
 import com.yogi.gitagyan.commonui.ImageBorderAnimation
 import com.yogi.gitagyan.ui.appbar.AppbarState
-import com.yogi.gitagyan.ui.model.PreferredLanguage
 import com.yogi.gitagyan.ui.theme.Dimensions.gitaPadding6x
 import kotlinx.coroutines.launch
 
@@ -60,10 +59,9 @@ fun SlokaDetails(
     else {
         val pagerState = rememberPagerState()
         val coroutineScope = rememberCoroutineScope()
-        val appState = viewModel.languageState.collectAsState()
         val chapterInfo = slokaDetailsPageState.chapterInfoItems
-        val list = chapterInfo?.slokas ?: emptyList()
-        val listSize = if (list.isNotEmpty()) list.size else 1
+        val list = chapterInfo?.slokUiEntityList ?: emptyList()
+        val listSize = if (list.isNotEmpty()) list.size + 1 else 1
 
         var progressbarState by remember {
             mutableStateOf(GitaProgressbarState())
@@ -79,7 +77,7 @@ fun SlokaDetails(
 
         val title = stringResource(
             id = R.string.chapter_number,
-            chapterInfo?.chapter_number ?: ""
+            chapterInfo?.chapterNumber ?: ""
         )
 
         LaunchedEffect(key1 = pagerState) {
@@ -104,30 +102,33 @@ fun SlokaDetails(
             )
 
             HorizontalPager(
-                pageCount = list.size,
+                pageCount = list.size + 1,
                 state = pagerState
             ) { page ->
-                val sloka = list[page]
-                SlokaComposable(
-                    slokaNumber = sloka.number,
-                    currentPage = pagerState.currentPage,
-                    lastSlokaNumber = list.size,
-                    sanskritSloka = sloka.sanskrit,
-                    sloka = if (appState.value.preferredLanguage == PreferredLanguage.ENGLISH) sloka.translations.EN
-                    else sloka.translations.HN,
-                    previousClicked = {
-                        coroutineScope.launch {
-                            if (pagerState.currentPage > 0)
-                                pagerState.animateScrollToPage(pagerState.currentPage - 1)
+                if (page == 0) {
+                    TextComponent(text = chapterInfo?.description?: "")
+                } else {
+                    val sloka = list[page-1]
+                    SlokaComposable(
+                        slokaNumber = sloka.slokaNumber,
+                        currentPage = pagerState.currentPage,
+                        lastSlokaNumber = list.size,
+                        sanskritSloka = sloka.slokaSanskrit,
+                        sloka = sloka.slokaTranslation,
+                        previousClicked = {
+                            coroutineScope.launch {
+                                if (pagerState.currentPage > 0)
+                                    pagerState.animateScrollToPage(pagerState.currentPage - 1)
+                            }
+                        },
+                        nextClicked = {
+                            coroutineScope.launch {
+                                if (pagerState.currentPage + 1 < list.size)
+                                    pagerState.animateScrollToPage(pagerState.currentPage + 1)
+                            }
                         }
-                    },
-                    nextClicked = {
-                        coroutineScope.launch {
-                            if (pagerState.currentPage < list.size - 1)
-                                pagerState.animateScrollToPage(pagerState.currentPage + 1)
-                        }
-                    }
-                )
+                    )
+                }
             }
         }
     }
@@ -229,7 +230,7 @@ private fun SlokaComposable(
                 )
             }
 
-            if (currentPage < lastSlokaNumber - 1) {
+            if (currentPage < lastSlokaNumber) {
                 OutLinedButton(
                     text = "Next",
                     iconAtStart = false,

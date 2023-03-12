@@ -2,10 +2,11 @@
     <string name="app_name">Gita Gyan</string>
     <string name="splash_title_name">Shrimad \nBhagvat Gita</string>
     <string name="splash_slogan">Helps you to live better.</string>
-    <string name="slok_number">Slok %s</string>
+    <string name="slok_number">%s</string>
     <string name="chapter_number_with_sanksrit">%1s. %2s</string>
-    <string name="chapter_number">CHAPTER %s</string>
-    <string name="chapters">Chapters</string>
+    <string name="chapter_number">%s</string>
+    <string name="chapters" translatable="false">Chapters</string>
+    <string name="chapters_hindi" translatable="false">अध्याय</string>
     <string name="okay_lets_go">OK, LET\'S GO</string>
     <string name="choose_your_preferred_language">Choose your \npreferred language</string>
     <string-array name="language_array">

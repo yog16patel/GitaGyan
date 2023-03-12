@@ -1,5 +1,6 @@
 package com.yogi.gitagyan.commonui
 
+import android.util.Log
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -42,6 +43,7 @@ fun GitaRadioGroup(
                     .selectable(
                         selected = isSelected(item),
                         onClick = {
+                            Log.e("Yogesh","Gita Radio Selected Index : $index")
                             onStateChanged(item)
                             selectedItemIndex(index)
                         },
@@ -53,7 +55,7 @@ fun GitaRadioGroup(
                     selected = isSelected(item),
                     onClick = {
                         selectedValue.value = item
-
+                        selectedItemIndex(index)
                     },
                     colors = RadioButtonDefaults.colors(
                         selectedColor = Saffron,

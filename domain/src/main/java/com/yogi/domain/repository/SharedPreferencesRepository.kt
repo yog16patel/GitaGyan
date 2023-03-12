@@ -1,7 +1,12 @@
 package com.yogi.domain.repository
 
+import com.yogi.domain.entities.PreferredLanguage
+
 interface SharedPreferencesRepository {
+
+    val keyLanguage: String
+
     fun setup()
-    fun saveValueSharedPreferences(key: String, value: String)
-    fun getSharedPreferencesValues(key: String) : String?
+    fun saveLanguageToSharedPref(value: PreferredLanguage)
+    fun getLanguageFromSharedPref() : PreferredLanguage?
 }

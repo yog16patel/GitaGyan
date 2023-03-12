@@ -1,8 +1,8 @@
 package com.yogi.gitagyan.ui.chapterlist
 
-import com.yogi.domain.model.ChapterInfoItem
+import com.yogi.gitagyan.models.ChapterInfoItemUi
 
 data class ChapterListPageState(
-    val chapterInfoItems: List<ChapterInfoItem> = emptyList(),
+    val chapterInfoItems: List<ChapterInfoItemUi> = emptyList(),
     val isLoading:Boolean = false
 )

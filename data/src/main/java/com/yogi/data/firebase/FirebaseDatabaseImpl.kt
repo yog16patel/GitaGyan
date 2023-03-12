@@ -4,27 +4,29 @@ import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ktx.getValue
 import com.yogi.data.extensions.await
 import com.yogi.domain.firebase.FirebaseDatabaseInterface
-import com.yogi.domain.model.ChapterInfoItem
-import com.yogi.domain.model.SlokaDetailItem
+import com.yogi.domain.entities.ChapterDetailItemEntity
+import com.yogi.domain.entities.ChapterInfoItemEntity
 import javax.inject.Inject
 
 class FirebaseDatabaseImpl @Inject constructor(
     private val database: FirebaseDatabase
 ): FirebaseDatabaseInterface {
-    override suspend fun getChapterList(): List<ChapterInfoItem>? {
-        val response = database.reference.child("chapters")
+    override suspend fun getChapterList(
+        language: String
+    ): List<ChapterInfoItemEntity>? {
+        val response = database.reference.child(language).child("chapters")
             .get()
             .await()
 
-        return response.getValue<ArrayList<ChapterInfoItem>>()
+        return response.getValue<ArrayList<ChapterInfoItemEntity>>()
     }
 
-    override suspend fun getSlokas(slokaNumber: String): SlokaDetailItem? {
-        val response = database.reference.child("Geeta")
-            .child(slokaNumber)
+    override suspend fun getSlokasOfChapter(language: String, chapterNumber: String): ChapterDetailItemEntity? {
+        val response = database.reference.child(language).child("Gita")
+            .child(chapterNumber)
             .get()
             .await()
 
-        return response.getValue<SlokaDetailItem>()
+        return response.getValue<ChapterDetailItemEntity>()
     }
 }

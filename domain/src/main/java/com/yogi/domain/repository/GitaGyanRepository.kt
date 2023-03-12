@@ -1,10 +1,10 @@
 package com.yogi.domain.repository
 
 import com.yogi.domain.core.Result
-import com.yogi.domain.model.ChapterInfoItem
-import com.yogi.domain.model.SlokaDetailItem
+import com.yogi.domain.models.ChapterDetailItem
+import com.yogi.domain.models.ChapterInfoItem
 
 interface GitaGyanRepository {
     suspend fun getChapterList(): Result<List<ChapterInfoItem>>
-    suspend fun getChapterDetails(chapterNumber: String): Result<SlokaDetailItem?>?
+    suspend fun getChapterDetails(chapterNumber: String): Result<ChapterDetailItem?>?
 }

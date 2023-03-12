@@ -1,8 +1,8 @@
 package com.yogi.gitagyan.ui.slokadetails
 
-import com.yogi.domain.model.SlokaDetailItem
+import com.yogi.gitagyan.models.ChapterDetailItemUi
 
 data class SlokaDetailsPageState(
-    val chapterInfoItems: SlokaDetailItem? = null,
+    val chapterInfoItems: ChapterDetailItemUi? = null,
     val isLoading:Boolean = false
 )

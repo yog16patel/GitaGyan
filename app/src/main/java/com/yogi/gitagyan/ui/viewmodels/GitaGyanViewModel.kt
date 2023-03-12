@@ -8,11 +8,11 @@ import com.yogi.domain.interactors.GetChapterListInteractor
 import com.yogi.domain.interactors.GetSlokaDetailsInteractor
 import com.yogi.domain.repository.SharedPreferencesRepository
 import com.yogi.gitagyan.LanguageState
-import com.yogi.gitagyan.appconfig.LanguageChangeUtil
-import com.yogi.gitagyan.appconfig.languageMap
 import com.yogi.gitagyan.ui.slokadetails.SlokaDetailsPageState
 import com.yogi.gitagyan.ui.chapterlist.ChapterListPageState
-import com.yogi.gitagyan.ui.model.PreferredLanguage
+import com.yogi.domain.entities.PreferredLanguage
+import com.yogi.gitagyan.ui.mappers.toChapterDetailItemUi
+import com.yogi.gitagyan.ui.mappers.toChapterInfoItemUiList
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -46,7 +46,8 @@ class GitaGyanViewModel @Inject constructor(
     private fun getChapterList() {
         _chapterListPageState.update {
             it.copy(
-                isLoading = false
+                isLoading = true,
+                chapterInfoItems = emptyList()
             )
         }
         viewModelScope.launch {
@@ -54,7 +55,7 @@ class GitaGyanViewModel @Inject constructor(
                 is Result.Success -> {
                     _chapterListPageState.update {
                         it.copy(
-                            chapterInfoItems = response.data,
+                            chapterInfoItems = response.data.toChapterInfoItemUiList(),
                             isLoading = false
                         )
                     }
@@ -73,7 +74,8 @@ class GitaGyanViewModel @Inject constructor(
             when (val response = getSlokaDetailsInteractor.executeSync(chapterNumber)) {
                 is Result.Success -> {
                     _slokaDetailsPageState.update {
-                        it.copy(isLoading = false, chapterInfoItems = response.data)
+                        val description = chapterListPageState.value.chapterInfoItems[chapterNumber].description
+                        it.copy(isLoading = false, chapterInfoItems = response.data?.toChapterDetailItemUi(description))
                     }
                 }
 
@@ -88,11 +90,15 @@ class GitaGyanViewModel @Inject constructor(
 
     fun setLanguagePreferences(preferredLanguage: PreferredLanguage) {
         _languageState.value = _languageState.value.copy(preferredLanguage = preferredLanguage)
-        sharedPreferencesRepository.saveValueSharedPreferences(
-            "Language",
-            preferredLanguage.languageCode
-        )
-        LanguageChangeUtil.applyLanguage(preferredLanguage.languageCode)
+        sharedPreferencesRepository.saveLanguageToSharedPref(preferredLanguage)
+        getChapterList()
     }
+    fun getLanguagePreference(){
+        val savedLanguage = sharedPreferencesRepository.getLanguageFromSharedPref()
+        savedLanguage?.let {
+            _languageState.value.copy(preferredLanguage = savedLanguage)
+        }
+    }
+
 
 }
