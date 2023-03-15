@@ -11,7 +11,6 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -39,8 +38,8 @@ import com.yogi.gitagyan.ui.theme.Dimensions.gitaPadding
 import com.yogi.gitagyan.ui.theme.Dimensions.gitaPadding2x
 import com.yogi.gitagyan.ui.theme.Saffron
 import com.yogi.gitagyan.ui.theme.SlokaBackgroud
-import com.yogi.gitagyan.ui.viewmodels.GitaGyanViewModel
 import com.yogi.gitagyan.R
+import com.yogi.gitagyan.commonui.GitaCenterAlignedTopAppBar
 import com.yogi.gitagyan.commonui.GitaLinearProgressBar
 import com.yogi.gitagyan.commonui.GitaProgressbarState
 import com.yogi.gitagyan.commonui.ImageBorderAnimation
@@ -50,14 +49,18 @@ import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun SlokaDetails(
-    viewModel: GitaGyanViewModel,
-    onComposing: (AppbarState) -> Unit
+fun SlokaDetailsScreen(
+    slokaDetailsPageState: SlokaDetailsPageState,
+    selectedSlokNumber: Int,
+    closeDetailScreen : () ->Unit = {}
 ) {
-    val slokaDetailsPageState by viewModel.slokaDetailsPageState.collectAsState()
+    val appState by remember {
+        mutableStateOf(AppbarState())
+    }
+
     if (slokaDetailsPageState.isLoading) ImageBorderAnimation()
     else {
-        val pagerState = rememberPagerState()
+        val pagerState = rememberPagerState(initialPage = selectedSlokNumber)
         val coroutineScope = rememberCoroutineScope()
         val chapterInfo = slokaDetailsPageState.chapterDetailsItems
         val list = chapterInfo?.slokUiEntityList ?: emptyList()
@@ -67,7 +70,7 @@ fun SlokaDetails(
             mutableStateOf(GitaProgressbarState())
         }
         var currentItem by remember {
-            mutableStateOf(1)
+            mutableStateOf(slokaDetailsPageState.lastSelectedSloka)
         }
 
         progressbarState = progressbarState.copy(
@@ -80,26 +83,18 @@ fun SlokaDetails(
             id = R.string.chapter_number,
             chapterInfo?.chapterNumber ?: ""
         )
+        appState.title = title
 
         LaunchedEffect(key1 = pagerState) {
-
             snapshotFlow { pagerState.currentPage }.collect {
                 currentItem = it + 1
             }
         }
 
-        LaunchedEffect(key1 = title) {
-            pagerState.animateScrollToPage(slokaDetailsPageState.lastSelectedSloka)
-            mutableStateOf(
-                onComposing(
-                    AppbarState(
-                        title = title,
-                        action = null
-                    )
-                )
-            )
-        }
         Column {
+            GitaCenterAlignedTopAppBar(appBarState = appState) {
+                closeDetailScreen()
+            }
             GitaLinearProgressBar(
                 progressbarState = progressbarState
             )

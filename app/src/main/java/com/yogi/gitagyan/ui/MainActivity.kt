@@ -2,30 +2,42 @@ package com.yogi.gitagyan.ui
 
 import android.os.Bundle
 import androidx.activity.compose.setContent
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Surface
+import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
 import androidx.compose.ui.Modifier
-import androidx.lifecycle.ViewModelProvider
 import com.yogi.gitagyan.ui.theme.Background
 import com.yogi.gitagyan.ui.viewmodels.GitaGyanViewModel
 import dagger.hilt.android.AndroidEntryPoint
+import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
+import com.google.accompanist.adaptive.calculateDisplayFeatures
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
 
 
-    lateinit var viewModel: GitaGyanViewModel
+     val viewModel: GitaGyanViewModel by viewModels()
+
+    @OptIn(ExperimentalMaterial3WindowSizeClassApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        viewModel = ViewModelProvider(this)[GitaGyanViewModel::class.java]
+        //viewModel = ViewModelProvider(this)[GitaGyanViewModel::class.java]
         setContent {
-            // A surface container using the 'background' color from the theme
+            val windowSize = calculateWindowSizeClass(activity = this)
+            val displayFeatures = calculateDisplayFeatures(activity = this)
+
+
             Surface(
                 modifier = Modifier.fillMaxSize(),
                 color = Background
             ) {
-                GitaGyanApp(viewModel = viewModel)
+                GitaGyanApp(
+                    windowSize = windowSize,
+                    displayFeatures = displayFeatures,
+                    viewModel = viewModel
+                )
             }
         }
 

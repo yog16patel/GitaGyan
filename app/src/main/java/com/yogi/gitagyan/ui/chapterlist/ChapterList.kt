@@ -1,17 +1,11 @@
 package com.yogi.gitagyan.ui.chapterlist
 
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -35,105 +29,110 @@ import com.yogi.gitagyan.R
 import com.yogi.gitagyan.commonui.ChooseLanguageDialogUi
 import com.yogi.gitagyan.commonui.GitaAlertDialogNew
 import com.yogi.gitagyan.commonui.ImageBorderAnimation
-import com.yogi.gitagyan.ui.appbar.AppbarState
 import com.yogi.domain.entities.PreferredLanguage
+import com.yogi.gitagyan.LanguageState
+import com.yogi.gitagyan.commonui.GitaTopAppBar
 import com.yogi.gitagyan.models.ChapterInfoItemUi
-import com.yogi.gitagyan.ui.theme.Black
+import com.yogi.gitagyan.ui.appbar.AppbarState
+
 
 @Composable
-fun ChapterList(
+fun ChapterListScreen( viewModel: GitaGyanViewModel,navigateToNext: ()->Unit,) {
+    ChapterList(viewModel = viewModel,navigateToNext =navigateToNext)
+}
+@Composable
+private fun ChapterList(
     viewModel: GitaGyanViewModel,
-    onComposing: (AppbarState) -> Unit,
-    navigateToSlokaOverview: (Int) -> Unit
+    navigateToNext: ()->Unit,
 ) {
     val chaptersState by viewModel.chapterListPageState.collectAsState()
-
+    viewModel.getLanguagePreference()
     if (chaptersState.isLoading) ImageBorderAnimation()
     else {
-
-        val chapterListPageState = chaptersState
-        var showDialog by remember {
-            mutableStateOf(false)
+        val languageState by viewModel.languageState.collectAsState()
+        val appbarState by remember {
+            mutableStateOf(AppbarState())
         }
-        val languageArray: Array<String> = stringArrayResource(id = R.array.language_array)
-
-        val appState = viewModel.languageState.collectAsState()
-        val defaultSelectedIem = languageArray[appState.value.preferredLanguage.index]
-        val languageState = viewModel.languageState.collectAsState()
-        if (showDialog) {
-            GitaAlertDialogNew(dialogOpen = true) {
-                ChooseLanguageDialogUi(
-                    items = languageArray,
-                    defaultSelectedIem = defaultSelectedIem,
-                    onDismissDialog = {
-                        val selection = PreferredLanguage.indexToEnum(it)
-                        Log.e(
-                            "Yogesh",
-                            "ChapterDetails.kt Selected Language : $selection and index : $it"
-                        )
-                        viewModel.setLanguagePreferences(preferredLanguage = selection)
-                        showDialog = false
-                    }
-                )
-            }
-        }
-        val title =
-            if (languageState.value.preferredLanguage == PreferredLanguage.ENGLISH) stringResource(
+        
+        val title = if (languageState.preferredLanguage == PreferredLanguage.ENGLISH) stringResource(
                 id = R.string.chapters
             )
             else stringResource(id = R.string.chapters_hindi)
+        appbarState.title = title
+        
+        ChapterList(
+            chapterListPageState = chaptersState,
+            languageState = languageState,
+            appbarState = appbarState,
+            selectedLanguage = {
+                viewModel.setLanguagePreferences(it)
+            },
+            selectedChapter = {
+                viewModel.updateSelectedChapter(it)
+                navigateToNext()
+            }
+        )
+    }
+}
 
-        LaunchedEffect(key1 = title) {
-            onComposing(
-                AppbarState(
-                    title = title,
-                    action = {
-                        IconButton(
-                            modifier = Modifier
-                                .padding(end = Dimensions.gitaPadding2x)
-                                .size(24.dp),
-                            onClick = {
-                                showDialog = true
-                            }) {
-                            Icon(
-                                imageVector = Icons.Filled.Settings,
-                                contentDescription = "Back",
-                                tint = Black
+@Composable
+private fun ChapterList(
+    chapterListPageState: ChapterListPageState,
+    languageState: LanguageState,
+    appbarState: AppbarState,
+    selectedLanguage: (PreferredLanguage) -> Unit,
+    selectedChapter: (Int) -> Unit
+) {
 
-                            )
-                        }
-                    }
-                )
+    var showDialog by remember {
+        mutableStateOf(false)
+    }
+    val languageArray: Array<String> = stringArrayResource(id = R.array.language_array)
+    val defaultSelectedIem = languageArray[languageState.preferredLanguage.index]
+
+    if (showDialog) {
+        GitaAlertDialogNew(dialogOpen = true) {
+            ChooseLanguageDialogUi(
+                items = languageArray,
+                defaultSelectedIem = defaultSelectedIem,
+                onDismissDialog = {
+                    val selection = PreferredLanguage.indexToEnum(it)
+                    selectedLanguage(selection)
+                    showDialog = false
+                }
             )
         }
+    }
 
-        Column(
-            modifier = Modifier.background(Background)
-        ) {
-            LazyColumn {
-                items(chapterListPageState.chapterInfoItems.size) { i ->
-                    val chapter = chapterListPageState.chapterInfoItems[i]
-
-                    ChapterItem(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .clickable {
-                                val chapterNumber = chapter.chapterNumber.toInt()
-                                viewModel.getSlokaDetails(chapterNumber = chapterNumber)
-                                navigateToSlokaOverview(chapterNumber)
-                            }
-                            .padding(
-                                vertical = Dimensions.gitaPadding,
-                                horizontal = Dimensions.gitaPadding2x
-                            ),
-                        chapter = chapter
-                    )
+    Column(
+        modifier = Modifier.background(Background)
+    ) {
+        LazyColumn {
+            item {
+                GitaTopAppBar(appbarState){
+                    showDialog = true
                 }
+            }
+            items(chapterListPageState.chapterInfoItems.size) { i ->
+                val chapter = chapterListPageState.chapterInfoItems[i]
+
+                ChapterItem(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable {
+                            val chapterNumber = chapter.chapterNumber.toInt()
+                            selectedChapter(chapterNumber)
+                        }
+                        .padding(
+                            vertical = Dimensions.gitaPadding,
+                            horizontal = Dimensions.gitaPadding2x
+                        ),
+                    chapter = chapter
+                )
             }
         }
     }
 }
-
 
 @Composable
 fun ChapterItem(

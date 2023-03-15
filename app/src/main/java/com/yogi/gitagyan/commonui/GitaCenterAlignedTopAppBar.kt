@@ -9,7 +9,6 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.unit.sp
-import com.yogi.gitagyan.GitaGyanAppState
 import com.yogi.gitagyan.ui.appbar.AppbarState
 import com.yogi.gitagyan.ui.theme.Background
 import com.yogi.gitagyan.ui.theme.Black
@@ -18,7 +17,7 @@ import com.yogi.gitagyan.ui.theme.Black
 @Composable
 fun GitaCenterAlignedTopAppBar(
     appBarState: AppbarState,
-    appState: GitaGyanAppState
+    backButtonClicked : ()->Unit
 ) {
     CenterAlignedTopAppBar(
         title = {
@@ -30,7 +29,7 @@ fun GitaCenterAlignedTopAppBar(
         },
         navigationIcon = {
             IconButton(onClick = {
-                appState.navController.popBackStack()
+                backButtonClicked()
             }) {
                 Icon(
                     imageVector = Icons.Filled.ArrowBack,

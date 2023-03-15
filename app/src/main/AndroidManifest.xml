@@ -8,10 +8,10 @@
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
-        android:icon="@drawable/gita_gayan_launcher_icon"
-        android:logo ="@drawable/gita_gayan_launcher_icon"
+        android:icon="@mipmap/ic_launcher_gita_gyan_new"
+        android:logo ="@mipmap/ic_launcher_gita_gyan_new"
         android:label="@string/app_name"
-        android:roundIcon="@drawable/gita_gayan_launcher_icon"
+        android:roundIcon="@mipmap/ic_launcher_gita_gyan_new"
         android:supportsRtl="true"
         android:theme="@style/Theme.GitaGyan"
         tools:targetApi="31">

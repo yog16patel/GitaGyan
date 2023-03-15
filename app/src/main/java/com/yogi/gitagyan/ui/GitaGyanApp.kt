@@ -1,102 +1,79 @@
 package com.yogi.gitagyan.ui
 
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Scaffold
+import android.util.Log
+import androidx.compose.material3.windowsizeclass.WindowSizeClass
+import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.window.layout.DisplayFeature
 import com.yogi.gitagyan.GitaGyanAppState
 import com.yogi.gitagyan.Screen
-import com.yogi.gitagyan.commonui.GitaCenterAlignedTopAppBar
-import com.yogi.gitagyan.commonui.GitaTopAppBar
 import com.yogi.gitagyan.rememberGitaGyanAppState
-import com.yogi.gitagyan.ui.appbar.AppbarState
-import com.yogi.gitagyan.ui.chapterlist.ChapterList
-import com.yogi.gitagyan.ui.slokadetails.ChapterOverview
-import com.yogi.gitagyan.ui.slokadetails.SlokaDetails
+import com.yogi.gitagyan.ui.chapterlist.ChapterListScreen
+import com.yogi.gitagyan.ui.slokadetails.ChapterOverviewScreen
+import com.yogi.gitagyan.ui.util.GitaContentType
 import com.yogi.gitagyan.ui.viewmodels.GitaGyanViewModel
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun GitaGyanApp(
+    windowSize : WindowSizeClass ,
+    displayFeatures: List<DisplayFeature> ,
     appState: GitaGyanAppState = rememberGitaGyanAppState(),
     viewModel: GitaGyanViewModel
 ) {
-    val navController = appState.navController
-    val navBackStackEntry by navController.currentBackStackEntryAsState()
-    var appBarState by remember {
-        mutableStateOf(AppbarState())
-    }
 
-    var showCenterAppBar by remember {
-        mutableStateOf(false)
-    }
-    showCenterAppBar = navBackStackEntry?.destination?.route != Screen.ChapterList.route
-    Scaffold(
-        topBar = {
-            when (showCenterAppBar) {
-                true -> GitaCenterAlignedTopAppBar(appBarState = appBarState, appState = appState)
-                else -> GitaTopAppBar(appBarState = appBarState)
-            }
+    val slokaDetailsPageState by viewModel.slokaDetailsPageState.collectAsState()
+
+    val contentType: GitaContentType =  when(windowSize.widthSizeClass){
+        WindowWidthSizeClass.Compact, WindowWidthSizeClass.Medium  -> GitaContentType.SINGLE_PANE
+        else -> {
+            //WindowWidthSizeClass.Expanded
+            GitaContentType.DUAL_PANE
         }
-    ) { innerPadding ->
+    }
 
-        Box(modifier = Modifier.padding(innerPadding)) {
-            NavHost(
-                navController = appState.navController,
-                startDestination = Screen.SplashScreen.route
-            ) {
-                composable(Screen.SplashScreen.route){ backStackEntry ->
-                    SplashScreen{
-                        appState.navigateToChapterList(backStackEntry){
-                            popUpTo(Screen.SplashScreen.route){
-                                inclusive = true
-                            }
-                        }
+    NavHost(
+        navController = appState.navController,
+        startDestination = Screen.SplashScreen.route
+    ) {
+        composable(Screen.SplashScreen.route) { backStackEntry ->
+            SplashScreen {
+                appState.navigateToChapterList(backStackEntry) {
+                    popUpTo(Screen.SplashScreen.route) {
+                        inclusive = true
                     }
                 }
-                composable(Screen.ChapterList.route) { backStackEntry ->
-                    ChapterList(
-                        viewModel = viewModel,
-                        navigateToSlokaOverview = { _ ->
-                            appState.navigateChapterOverview(backStackEntry)
-                        },
-                        onComposing = {
-                            appBarState = it
-                        }
-                    )
-                }
-                composable(Screen.ChapterOverview.route){ backStackEntry ->
-                    ChapterOverview(
-                        viewModel = viewModel,
-                        onComposing = {
-                        appBarState = it
-                    },
-                        navigateToSlokaDeails = {
-                            appState.navigateToChapterDetails(
-                                backStackEntry
-                            )
-
-                        },
-                    )
-                }
-                composable(Screen.ChapterDetails.route) {
-                    SlokaDetails(
-                        viewModel = viewModel,
-                        onComposing = {
-                            appBarState = it
-                        }
-                    )
-                }
             }
         }
+        composable(Screen.ChapterList.route) { backStackEntry ->
+            ChapterListScreen(
+                viewModel = viewModel,
+                navigateToNext = {
+                    appState.navigateChapterOverview(backStackEntry)
+                }
+            )
+        }
+        composable(Screen.ChapterOverview.route) { backStackEntry ->
+            ChapterOverviewScreen(
+                slokaDetailsPageState = slokaDetailsPageState,
+                contentType = contentType,
+                displayFeatures = displayFeatures,
+                goBack = {
+                    appState.navController.popBackStack()
+                },
+                closeDetailScreen = {
+                    viewModel.closeDetailScreen()
+                },
+                navigateToDetail = { index, contentType ->
+                    Log.e("Yogesh","Sloka Selection : $index")
+                    viewModel.setLastSelectedSloka(index, contentType)
+                }
+            )
+        }
     }
+
+
 }

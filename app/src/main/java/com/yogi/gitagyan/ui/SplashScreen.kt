@@ -16,9 +16,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.sp
 import com.yogi.gitagyan.R
-import com.yogi.gitagyan.commonui.TextComponent
+import com.yogi.gitagyan.commonui.TextComponentDevnagri
 import com.yogi.gitagyan.ui.theme.Background
-import kotlinx.coroutines.delay
 
 @Composable
 fun SplashScreen(
@@ -34,17 +33,16 @@ fun SplashScreen(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         LaunchedEffect(key1 = true){
-            delay(1000)
             finished()
         }
         Image(painter = painterResource(id = R.drawable.gita_gayan_launcher_icon), contentDescription = "")
-        TextComponent(
+        TextComponentDevnagri(
             text = stringResource(id = R.string.splash_title_name).uppercase(),
             fontWeight = FontWeight.Bold,
             fontSize = 30.sp,
             textAlign = TextAlign.Center
         )
-        TextComponent(text = stringResource(id = R.string.splash_slogan),  fontSize = 15.sp)
+        TextComponentDevnagri(text = stringResource(id = R.string.splash_slogan),  fontSize = 15.sp)
 
     }
 

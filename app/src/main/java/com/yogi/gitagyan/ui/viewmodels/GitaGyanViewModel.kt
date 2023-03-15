@@ -13,6 +13,7 @@ import com.yogi.gitagyan.ui.chapterlist.ChapterListPageState
 import com.yogi.domain.entities.PreferredLanguage
 import com.yogi.gitagyan.ui.mappers.toChapterDetailItemUi
 import com.yogi.gitagyan.ui.mappers.toChapterInfoItemUiList
+import com.yogi.gitagyan.ui.util.GitaContentType
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -40,6 +41,7 @@ class GitaGyanViewModel @Inject constructor(
         get() = _languageState
 
     init {
+        getLanguagePreference()
         getChapterList()
     }
 
@@ -66,7 +68,8 @@ class GitaGyanViewModel @Inject constructor(
         }
     }
 
-    fun getSlokaDetails(chapterNumber: Int) {
+    fun updateSelectedChapter(chapterNumber: Int) {
+        chapterListPageState.value.selectedChapter = chapterNumber
         _slokaDetailsPageState.update {
             it.copy(isLoading = true)
         }
@@ -106,9 +109,32 @@ class GitaGyanViewModel @Inject constructor(
     fun getLanguagePreference() {
         val savedLanguage = sharedPreferencesRepository.getLanguageFromSharedPref()
         savedLanguage?.let {
-            _languageState.value.copy(preferredLanguage = savedLanguage)
+            _languageState.value = _languageState.value.copy(preferredLanguage = savedLanguage)
         }
     }
 
+    fun setLastSelectedSloka(slokNumber: Int, contentType: GitaContentType) {
+        _slokaDetailsPageState.value =
+            _slokaDetailsPageState.value.copy(
+                lastSelectedSloka = slokNumber,
+                isDetailOpen = contentType == GitaContentType.SINGLE_PANE
+            )
+    }
+
+    fun closeDetailScreen() {
+        _slokaDetailsPageState.value = _slokaDetailsPageState.value
+            .copy(
+                isDetailOpen = false,
+                lastSelectedSloka = _slokaDetailsPageState.value.lastSelectedSloka
+            )
+    }
+
+    fun openDetailScreen(){
+        _slokaDetailsPageState.value = _slokaDetailsPageState.value
+            .copy(
+                isDetailOpen = true,
+                lastSelectedSloka = _slokaDetailsPageState.value.lastSelectedSloka
+            )
+    }
 
 }

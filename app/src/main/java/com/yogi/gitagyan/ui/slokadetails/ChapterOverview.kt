@@ -19,7 +19,6 @@ import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -31,7 +30,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.window.layout.DisplayFeature
+import com.google.accompanist.adaptive.HorizontalTwoPaneStrategy
+import com.google.accompanist.adaptive.TwoPane
 import com.yogi.gitagyan.R
+import com.yogi.gitagyan.commonui.GitaCenterAlignedTopAppBar
+import com.yogi.gitagyan.commonui.ImageBorderAnimation
 import com.yogi.gitagyan.commonui.TextComponent
 import com.yogi.gitagyan.commonui.TextComponentDevnagri
 import com.yogi.gitagyan.models.SlokUi
@@ -39,27 +43,98 @@ import com.yogi.gitagyan.ui.appbar.AppbarState
 import com.yogi.gitagyan.ui.theme.Dimensions
 import com.yogi.gitagyan.ui.theme.LightSaffron
 import com.yogi.gitagyan.ui.theme.Saffron
-import com.yogi.gitagyan.ui.viewmodels.GitaGyanViewModel
+import com.yogi.gitagyan.ui.util.GitaContentType
 
 @Composable
-fun ChapterOverview(
-    viewModel: GitaGyanViewModel,
-    onComposing: (AppbarState) -> Unit,
-    navigateToSlokaDeails: () -> Unit,
+fun ChapterOverviewScreen(
+    slokaDetailsPageState : SlokaDetailsPageState,
+    contentType: GitaContentType,
+    displayFeatures: List<DisplayFeature>,
+    closeDetailScreen: () -> Unit,
+    goBack: () -> Unit,
+    navigateToDetail: (Int, contentType: GitaContentType) -> Unit
 ) {
-    val slokaDetailsPageState by viewModel.slokaDetailsPageState.collectAsState()
-    val slokaList = slokaDetailsPageState.chapterDetailsItems?.slokUiEntityList ?: emptyList()
-    val title = slokaDetailsPageState.chapterDetailsItems?.chapterNumber ?: ""
-    var expand by remember {
-        mutableStateOf(false)
+
+    /**
+     * When moving from LIST_AND_DETAIL page to LIST page clear the selection and user should see LIST screen.
+     */
+    LaunchedEffect(key1 = contentType) {
+        if (contentType == GitaContentType.SINGLE_PANE && !slokaDetailsPageState.isDetailOpen) {
+            closeDetailScreen()
+        }
     }
 
-    LaunchedEffect(key1 = title) {
-        onComposing(
-            AppbarState(
-                title = title
-            )
+    when (slokaDetailsPageState.isLoading) {
+        true -> ImageBorderAnimation()
+        else -> {
+            if (contentType == GitaContentType.DUAL_PANE) {
+                TwoPane(
+                    first = {
+                        ChapterOverviewPaneContent(
+                            slokaDetailsPageState = slokaDetailsPageState,
+                            onBackPressed = goBack,
+                            navigateToDetail = navigateToDetail
+                        )
+                    },
+                    second = {
+                        SlokaDetailsScreen(
+                            slokaDetailsPageState = slokaDetailsPageState,
+                            selectedSlokNumber = slokaDetailsPageState.lastSelectedSloka
+                        )
+                    },
+                    strategy = HorizontalTwoPaneStrategy(splitFraction = 0.5f, gapWidth = 16.dp),
+                    displayFeatures = displayFeatures
+                )
+            } else {
+
+                SinglePaneContent(
+                    slokaDetailsPageState = slokaDetailsPageState,
+                    closeDetailScreen = closeDetailScreen,
+                    goBack = goBack,
+                    navigateToDetail = navigateToDetail
+                )
+
+            }
+        }
+    }
+}
+
+
+@Composable
+fun SinglePaneContent(
+    slokaDetailsPageState: SlokaDetailsPageState,
+    closeDetailScreen: () -> Unit,
+    goBack: () -> Unit,
+    navigateToDetail: (Int, GitaContentType) -> Unit
+) {
+    if (slokaDetailsPageState.isDetailOpen) {
+        SlokaDetailsScreen(slokaDetailsPageState = slokaDetailsPageState, selectedSlokNumber = slokaDetailsPageState.lastSelectedSloka) {
+            closeDetailScreen()
+        }
+    } else {
+        ChapterOverviewPaneContent(
+            slokaDetailsPageState = slokaDetailsPageState,
+            onBackPressed = goBack,
+            navigateToDetail = navigateToDetail
         )
+    }
+}
+
+
+@Composable
+fun ChapterOverviewPaneContent(
+    slokaDetailsPageState: SlokaDetailsPageState,
+    onBackPressed: () -> Unit,
+    navigateToDetail: (Int, contentType: GitaContentType) -> Unit
+) {
+
+    val slokaList = slokaDetailsPageState.chapterDetailsItems?.slokUiEntityList ?: emptyList()
+    val appBarState by remember {
+        mutableStateOf(AppbarState())
+    }
+    appBarState.title = slokaDetailsPageState.chapterDetailsItems?.chapterTitle ?: "testing"
+    var expand by remember {
+        mutableStateOf(false)
     }
 
     Column(
@@ -72,6 +147,11 @@ fun ChapterOverview(
                 end = Dimensions.gitaPadding
             )
         ) {
+            item {
+                GitaCenterAlignedTopAppBar(appBarState = appBarState) {
+                    onBackPressed()
+                }
+            }
             item {
                 TextComponentDevnagri(
                     modifier = Modifier
@@ -117,8 +197,7 @@ fun ChapterOverview(
             }
             items(slokaList.size) { index ->
                 OverviewSingleItem(slokUi = slokaList[index], index = index) {
-                    slokaDetailsPageState.lastSelectedSloka = it
-                    navigateToSlokaDeails()
+                    navigateToDetail(it, GitaContentType.SINGLE_PANE)
                 }
             }
         }
@@ -133,7 +212,7 @@ private fun OverviewSingleItem(
 ) {
     Column(
         modifier = Modifier
-            .clickable (
+            .clickable(
                 interactionSource = MutableInteractionSource(),
                 onClick = { selectedSlokaNumber(index) },
                 indication = rememberRipple(bounded = true)
