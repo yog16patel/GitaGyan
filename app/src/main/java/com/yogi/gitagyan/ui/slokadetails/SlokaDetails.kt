@@ -4,7 +4,7 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.pager.HorizontalPager
-import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Card
@@ -42,7 +42,6 @@ import com.yogi.gitagyan.R
 import com.yogi.gitagyan.commonui.GitaCenterAlignedTopAppBar
 import com.yogi.gitagyan.commonui.GitaLinearProgressBar
 import com.yogi.gitagyan.commonui.GitaProgressbarState
-import com.yogi.gitagyan.commonui.ImageBorderAnimation
 import com.yogi.gitagyan.ui.appbar.AppbarState
 import com.yogi.gitagyan.ui.theme.Dimensions.gitaPadding6x
 import kotlinx.coroutines.launch
@@ -52,81 +51,82 @@ import kotlinx.coroutines.launch
 fun SlokaDetailsScreen(
     slokaDetailsPageState: SlokaDetailsPageState,
     selectedSlokNumber: Int,
-    closeDetailScreen : () ->Unit = {}
+    closeDetailScreen: () -> Unit = {}
 ) {
     val appState by remember {
         mutableStateOf(AppbarState())
     }
 
-    if (slokaDetailsPageState.isLoading) ImageBorderAnimation()
-    else {
-        val pagerState = rememberPagerState(initialPage = selectedSlokNumber)
-        val coroutineScope = rememberCoroutineScope()
-        val chapterInfo = slokaDetailsPageState.chapterDetailsItems
-        val list = chapterInfo?.slokUiEntityList ?: emptyList()
-        val listSize = if (list.isNotEmpty()) list.size else 1
+    val pagerState by remember (key1 = selectedSlokNumber) {
+       mutableStateOf(PagerState(initialPage = selectedSlokNumber))
+    }
 
-        var progressbarState by remember {
-            mutableStateOf(GitaProgressbarState())
-        }
-        var currentItem by remember {
-            mutableStateOf(slokaDetailsPageState.lastSelectedSloka)
-        }
+    val coroutineScope = rememberCoroutineScope()
+    val chapterInfo = slokaDetailsPageState.chapterDetailsItems
+    val list = chapterInfo?.slokUiEntityList ?: emptyList()
+    val listSize = if (list.isNotEmpty()) list.size else 1
 
-        progressbarState = progressbarState.copy(
-            currentItem = currentItem.toFloat(),
-            totalItem = listSize.toFloat()
+    var progressbarState by remember {
+        mutableStateOf(GitaProgressbarState())
+    }
+    var currentItem by remember {
+        mutableStateOf(slokaDetailsPageState.lastSelectedSloka)
+    }
+
+    progressbarState = progressbarState.copy(
+        currentItem = currentItem.toFloat(),
+        totalItem = listSize.toFloat()
+    )
+
+
+    val title = stringResource(
+        id = R.string.chapter_number,
+        chapterInfo?.chapterNumber ?: ""
+    )
+    appState.title = title
+
+    LaunchedEffect(key1 = pagerState) {
+        snapshotFlow { pagerState.currentPage }.collect {
+            currentItem = it + 1
+        }
+    }
+
+    Column {
+        GitaCenterAlignedTopAppBar(appBarState = appState) {
+            closeDetailScreen()
+        }
+        GitaLinearProgressBar(
+            progressbarState = progressbarState
         )
 
-
-        val title = stringResource(
-            id = R.string.chapter_number,
-            chapterInfo?.chapterNumber ?: ""
-        )
-        appState.title = title
-
-        LaunchedEffect(key1 = pagerState) {
-            snapshotFlow { pagerState.currentPage }.collect {
-                currentItem = it + 1
-            }
-        }
-
-        Column {
-            GitaCenterAlignedTopAppBar(appBarState = appState) {
-                closeDetailScreen()
-            }
-            GitaLinearProgressBar(
-                progressbarState = progressbarState
-            )
-
-            HorizontalPager(
-                pageCount = list.size,
-                state = pagerState
-            ) { page ->
-                val sloka = list[page]
-                SlokaComposable(
-                    slokaNumber = sloka.slokaNumber,
-                    currentPage = pagerState.currentPage,
-                    lastSlokaNumber = list.size,
-                    sanskritSloka = sloka.slokaSanskrit,
-                    sloka =  sloka.slokaTranslation,
-                    previousClicked = {
-                        coroutineScope.launch {
-                            if (pagerState.currentPage > 0)
-                                pagerState.animateScrollToPage(pagerState.currentPage - 1)
-                        }
-                    },
-                    nextClicked = {
-                        coroutineScope.launch {
-                            if (pagerState.currentPage < list.size - 1)
-                                pagerState.animateScrollToPage(pagerState.currentPage + 1)
-                        }
+        HorizontalPager(
+            pageCount = list.size,
+            state = pagerState
+        ) { page ->
+            val sloka = list[page]
+            SlokaComposable(
+                slokaNumber = sloka.slokaNumber,
+                currentPage = pagerState.currentPage,
+                lastSlokaNumber = list.size,
+                sanskritSloka = sloka.slokaSanskrit,
+                sloka = sloka.slokaTranslation,
+                previousClicked = {
+                    coroutineScope.launch {
+                        if (pagerState.currentPage > 0)
+                            pagerState.animateScrollToPage(pagerState.currentPage - 1)
                     }
-                )
-            }
+                },
+                nextClicked = {
+                    coroutineScope.launch {
+                        if (pagerState.currentPage < list.size - 1)
+                            pagerState.animateScrollToPage(pagerState.currentPage + 1)
+                    }
+                }
+            )
         }
     }
 }
+
 
 @Composable
 private fun SlokaComposable(

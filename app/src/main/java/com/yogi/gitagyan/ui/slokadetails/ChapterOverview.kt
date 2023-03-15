@@ -19,6 +19,7 @@ import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -30,6 +31,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.window.layout.DisplayFeature
 import com.google.accompanist.adaptive.HorizontalTwoPaneStrategy
 import com.google.accompanist.adaptive.TwoPane
@@ -44,16 +46,25 @@ import com.yogi.gitagyan.ui.theme.Dimensions
 import com.yogi.gitagyan.ui.theme.LightSaffron
 import com.yogi.gitagyan.ui.theme.Saffron
 import com.yogi.gitagyan.ui.util.GitaContentType
+import com.yogi.gitagyan.ui.viewmodels.GitaGyanViewModel
 
 @Composable
 fun ChapterOverviewScreen(
-    slokaDetailsPageState : SlokaDetailsPageState,
+    viewModel: GitaGyanViewModel,
     contentType: GitaContentType,
     displayFeatures: List<DisplayFeature>,
     closeDetailScreen: () -> Unit,
     goBack: () -> Unit,
     navigateToDetail: (Int, contentType: GitaContentType) -> Unit
 ) {
+
+    var recompose by remember {
+        mutableStateOf(false)
+    }
+
+    if(recompose) recompose = false
+
+    val slokaDetailsPageState by viewModel.slokaDetailsPageState.collectAsState()
 
     /**
      * When moving from LIST_AND_DETAIL page to LIST page clear the selection and user should see LIST screen.
@@ -73,7 +84,10 @@ fun ChapterOverviewScreen(
                         ChapterOverviewPaneContent(
                             slokaDetailsPageState = slokaDetailsPageState,
                             onBackPressed = goBack,
-                            navigateToDetail = navigateToDetail
+                            navigateToDetail = { number,type ->
+                                viewModel.setLastSelectedSloka(number,type)
+                                recompose = true
+                            }
                         )
                     },
                     second = {
@@ -132,7 +146,7 @@ fun ChapterOverviewPaneContent(
     val appBarState by remember {
         mutableStateOf(AppbarState())
     }
-    appBarState.title = slokaDetailsPageState.chapterDetailsItems?.chapterTitle ?: "testing"
+    appBarState.title = slokaDetailsPageState.chapterDetailsItems?.chapterNumber?:""
     var expand by remember {
         mutableStateOf(false)
     }
@@ -197,6 +211,7 @@ fun ChapterOverviewPaneContent(
             }
             items(slokaList.size) { index ->
                 OverviewSingleItem(slokUi = slokaList[index], index = index) {
+
                     navigateToDetail(it, GitaContentType.SINGLE_PANE)
                 }
             }
