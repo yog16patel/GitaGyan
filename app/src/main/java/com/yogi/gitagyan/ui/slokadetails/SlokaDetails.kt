@@ -51,7 +51,8 @@ import kotlinx.coroutines.launch
 fun SlokaDetailsScreen(
     slokaDetailsPageState: SlokaDetailsPageState,
     selectedSlokNumber: Int,
-    closeDetailScreen: () -> Unit = {}
+    closeDetailScreen: () -> Unit = {},
+    selectedSlokaNumber: (Int) -> Unit
 ) {
     val appState by remember {
         mutableStateOf(AppbarState())
@@ -77,7 +78,6 @@ fun SlokaDetailsScreen(
         currentItem = currentItem.toFloat(),
         totalItem = listSize.toFloat()
     )
-
 
     val title = stringResource(
         id = R.string.chapter_number,
@@ -112,14 +112,20 @@ fun SlokaDetailsScreen(
                 sloka = sloka.slokaTranslation,
                 previousClicked = {
                     coroutineScope.launch {
-                        if (pagerState.currentPage > 0)
+                        if (pagerState.currentPage > 0) {
                             pagerState.animateScrollToPage(pagerState.currentPage - 1)
+                            selectedSlokaNumber(pagerState.currentPage)
+                        }
                     }
+
                 },
                 nextClicked = {
                     coroutineScope.launch {
-                        if (pagerState.currentPage < list.size - 1)
+                        if (pagerState.currentPage < list.size - 1){
                             pagerState.animateScrollToPage(pagerState.currentPage + 1)
+                            selectedSlokaNumber(pagerState.currentPage)
+                        }
+
                     }
                 }
             )
@@ -137,7 +143,6 @@ private fun SlokaComposable(
     sloka: String,
     previousClicked: () -> Unit,
     nextClicked: () -> Unit,
-
     ) {
 
     val scrollState = rememberScrollState()

@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
@@ -31,7 +32,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.window.layout.DisplayFeature
 import com.google.accompanist.adaptive.HorizontalTwoPaneStrategy
 import com.google.accompanist.adaptive.TwoPane
@@ -58,12 +58,6 @@ fun ChapterOverviewScreen(
     navigateToDetail: (Int, contentType: GitaContentType) -> Unit
 ) {
 
-    var recompose by remember {
-        mutableStateOf(false)
-    }
-
-    if(recompose) recompose = false
-
     val slokaDetailsPageState by viewModel.slokaDetailsPageState.collectAsState()
 
     /**
@@ -84,9 +78,8 @@ fun ChapterOverviewScreen(
                         ChapterOverviewPaneContent(
                             slokaDetailsPageState = slokaDetailsPageState,
                             onBackPressed = goBack,
-                            navigateToDetail = { number,type ->
-                                viewModel.setLastSelectedSloka(number,type)
-                                recompose = true
+                            navigateToDetail = { number, type ->
+                                viewModel.setLastSelectedSloka(number, type)
                             }
                         )
                     },
@@ -94,14 +87,16 @@ fun ChapterOverviewScreen(
                         SlokaDetailsScreen(
                             slokaDetailsPageState = slokaDetailsPageState,
                             selectedSlokNumber = slokaDetailsPageState.lastSelectedSloka
-                        )
+                        ) { number ->
+                            viewModel.setLastSelectedSloka(number, GitaContentType.SINGLE_PANE)
+                        }
                     },
                     strategy = HorizontalTwoPaneStrategy(splitFraction = 0.5f, gapWidth = 16.dp),
                     displayFeatures = displayFeatures
                 )
             } else {
-
                 SinglePaneContent(
+                    viewModel = viewModel,
                     slokaDetailsPageState = slokaDetailsPageState,
                     closeDetailScreen = closeDetailScreen,
                     goBack = goBack,
@@ -116,15 +111,22 @@ fun ChapterOverviewScreen(
 
 @Composable
 fun SinglePaneContent(
+    viewModel: GitaGyanViewModel,
     slokaDetailsPageState: SlokaDetailsPageState,
     closeDetailScreen: () -> Unit,
     goBack: () -> Unit,
     navigateToDetail: (Int, GitaContentType) -> Unit
 ) {
     if (slokaDetailsPageState.isDetailOpen) {
-        SlokaDetailsScreen(slokaDetailsPageState = slokaDetailsPageState, selectedSlokNumber = slokaDetailsPageState.lastSelectedSloka) {
-            closeDetailScreen()
-        }
+        SlokaDetailsScreen(
+            slokaDetailsPageState = slokaDetailsPageState,
+            selectedSlokNumber = slokaDetailsPageState.lastSelectedSloka,
+            closeDetailScreen = { closeDetailScreen() },
+            selectedSlokaNumber = {number ->
+                viewModel.setLastSelectedSloka(number, GitaContentType.SINGLE_PANE)
+
+            }
+        )
     } else {
         ChapterOverviewPaneContent(
             slokaDetailsPageState = slokaDetailsPageState,
@@ -142,11 +144,15 @@ fun ChapterOverviewPaneContent(
     navigateToDetail: (Int, contentType: GitaContentType) -> Unit
 ) {
 
+    val lazyColumnState = rememberLazyListState()
+    LaunchedEffect(key1 = slokaDetailsPageState, block ={
+        lazyColumnState.animateScrollToItem(slokaDetailsPageState.lastSelectedSloka + 2)
+    } )
     val slokaList = slokaDetailsPageState.chapterDetailsItems?.slokUiEntityList ?: emptyList()
     val appBarState by remember {
         mutableStateOf(AppbarState())
     }
-    appBarState.title = slokaDetailsPageState.chapterDetailsItems?.chapterNumber?:""
+    appBarState.title = slokaDetailsPageState.chapterDetailsItems?.chapterNumber ?: ""
     var expand by remember {
         mutableStateOf(false)
     }
@@ -156,9 +162,11 @@ fun ChapterOverviewPaneContent(
     ) {
 
         LazyColumn(
+            state = lazyColumnState,
             modifier = Modifier.padding(
                 start = Dimensions.gitaPadding,
-                end = Dimensions.gitaPadding
+                end = Dimensions.gitaPadding,
+
             )
         ) {
             item {
@@ -211,7 +219,6 @@ fun ChapterOverviewPaneContent(
             }
             items(slokaList.size) { index ->
                 OverviewSingleItem(slokUi = slokaList[index], index = index) {
-
                     navigateToDetail(it, GitaContentType.SINGLE_PANE)
                 }
             }
@@ -223,7 +230,7 @@ fun ChapterOverviewPaneContent(
 private fun OverviewSingleItem(
     slokUi: SlokUi,
     index: Int,
-    selectedSlokaNumber: (slokNumber: Int) -> Unit
+    selectedSlokaNumber: (slokIndex: Int) -> Unit
 ) {
     Column(
         modifier = Modifier
