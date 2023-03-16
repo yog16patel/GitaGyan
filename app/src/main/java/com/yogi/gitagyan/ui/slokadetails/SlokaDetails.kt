@@ -26,7 +26,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.yogi.gitagyan.commonui.OutLinedButton
 import com.yogi.gitagyan.commonui.TextComponent
 import com.yogi.gitagyan.commonui.TextComponentDevnagri
 import com.yogi.gitagyan.ui.slokadetails.SlokaDetails.Companion.devnagriFontsize
@@ -39,6 +38,7 @@ import com.yogi.gitagyan.ui.theme.Dimensions.gitaPadding2x
 import com.yogi.gitagyan.ui.theme.Saffron
 import com.yogi.gitagyan.ui.theme.SlokaBackgroud
 import com.yogi.gitagyan.R
+import com.yogi.gitagyan.commonui.CircleButton
 import com.yogi.gitagyan.commonui.GitaCenterAlignedTopAppBar
 import com.yogi.gitagyan.commonui.GitaLinearProgressBar
 import com.yogi.gitagyan.commonui.GitaProgressbarState
@@ -214,10 +214,8 @@ private fun SlokaComposable(
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             if (currentPage > 0) {
-                OutLinedButton(
-                    text = "Previous",
+                CircleButton(
                     border = Saffron,
-                    textColor = Saffron,
                     iconId = painterResource(id = R.drawable.ic_baseline_arrow_back)
                 ) {
                     previousClicked()
@@ -231,11 +229,8 @@ private fun SlokaComposable(
             }
 
             if (currentPage < lastSlokaNumber - 1) {
-                OutLinedButton(
-                    text = "Next",
-                    iconAtStart = false,
+                CircleButton(
                     border = Saffron,
-                    textColor = Saffron,
                     iconId = painterResource(id = R.drawable.ic_baseline_arrow_forward)
                 ) {
                     nextClicked()

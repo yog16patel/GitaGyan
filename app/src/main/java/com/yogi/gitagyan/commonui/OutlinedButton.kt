@@ -1,7 +1,10 @@
 package com.yogi.gitagyan.commonui
 
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
@@ -14,6 +17,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.unit.dp
 import com.yogi.gitagyan.ui.theme.Background
+import com.yogi.gitagyan.ui.theme.Dimensions.gitaPadding7x
 import com.yogi.gitagyan.ui.theme.Dimensions.gitaPaddingHalf
 
 @Composable
@@ -58,4 +62,23 @@ fun OutLinedButton(
 
     }
 
+}
+
+@Composable
+fun CircleButton(
+    modifier: Modifier = Modifier,
+    border: Color,
+    iconId: Painter,
+    onClick: () -> Unit
+) {
+
+    OutlinedButton(onClick = { onClick() },
+        modifier= modifier.size(gitaPadding7x),  //avoid the oval shape
+        shape = CircleShape,
+        border= BorderStroke(2.dp, border),
+        contentPadding = PaddingValues(0.dp),  //avoid the little icon
+        colors = ButtonDefaults.outlinedButtonColors(contentColor =  border)
+    ) {
+        Icon(painter = iconId, contentDescription = "content description")
+    }
 }
