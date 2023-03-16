@@ -59,7 +59,6 @@ fun ChapterOverviewScreen(
 ) {
 
     val slokaDetailsPageState by viewModel.slokaDetailsPageState.collectAsState()
-
     /**
      * When moving from LIST_AND_DETAIL page to LIST page clear the selection and user should see LIST screen.
      */
