@@ -99,6 +99,7 @@ fun SlokaDetailsScreen(
             progressbarState = progressbarState
         )
 
+
         HorizontalPager(
             pageCount = list.size,
             state = pagerState
