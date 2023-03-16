@@ -108,7 +108,6 @@ fun ChapterOverviewScreen(
     }
 }
 
-
 @Composable
 fun SinglePaneContent(
     viewModel: GitaGyanViewModel,
