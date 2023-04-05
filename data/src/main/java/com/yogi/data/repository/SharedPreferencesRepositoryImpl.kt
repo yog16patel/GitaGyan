@@ -13,6 +13,13 @@ class SharedPreferencesRepositoryImpl @Inject constructor(
 
     override val keyLanguage: String
         get() = "LANGUAGE"
+
+    override val keyLastReadSlok: String
+        get() = "LAST_READ_SLOK"
+
+    override val keyLastReadSlokChapterIndex: String
+        get() = "LAST_READ_SLOK_INDEX"
+
     override fun setup() {
         //Do nothing for now
     }
@@ -25,7 +32,29 @@ class SharedPreferencesRepositoryImpl @Inject constructor(
     }
 
     override fun getLanguageFromSharedPref(): PreferredLanguage {
-        val defaultLanguage = sharedPreferences.getString(keyLanguage,PreferredLanguage.ENGLISH.languageName)
+        val defaultLanguage =
+            sharedPreferences.getString(keyLanguage, PreferredLanguage.ENGLISH.languageName)
         return PreferredLanguage.languageNameToEnum(defaultLanguage)
     }
+
+    override fun saveLastReadSlokMapJsonString(lastSelectedSlokAndChapter: String) {
+        with(sharedPreferences.edit()) {
+            putString(keyLastReadSlok, lastSelectedSlokAndChapter)
+            apply()
+        }
+    }
+
+    override fun saveIndexOfLastReadSlokaAndChapter(indexesAsString: String) {
+        with(sharedPreferences.edit()) {
+            putString(keyLastReadSlokChapterIndex, indexesAsString)
+            apply()
+        }
+    }
+    override fun getSaveLastReadSlokChapterIndex(): String? {
+        return sharedPreferences.getString(keyLastReadSlokChapterIndex, "")
+    }
+    override fun getSaveLastReadSlokMap(): String? {
+        return sharedPreferences.getString(keyLastReadSlok, "")
+    }
+
 }

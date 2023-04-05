@@ -3,14 +3,24 @@
     <string name="splash_title_name">Shrimad \nBhagvat Gita</string>
     <string name="splash_slogan">Helps you to live better.</string>
     <string name="slok_number">%s</string>
+    <string name="progress_percent" translatable="false">%1$s %%</string>
     <string name="chapter_number_with_sanksrit">%1s. %2s</string>
     <string name="chapter_number">%s</string>
-    <string name="chapters" translatable="false">Chapters</string>
+    <string name="chapters">Chapters %s</string>
+    <string name="slok_name">Slok %s</string>
     <string name="chapters_hindi" translatable="false">अध्याय</string>
     <string name="okay_lets_go">OK, LET\'S GO</string>
     <string name="choose_your_preferred_language">Choose your \npreferred language</string>
+    <string name="namaste">Namaste,</string>
+    <string name="bhakt">Bhakta</string>
+    <string name="current_progress">CURRENT PROGRESS</string>
+    <string name="explore_gita">EXPLORE GITA</string>
+    <string name="liked_slokas">LIKED SLOKAS</string>
+    <string name="chapter">chapterS</string>
     <string-array name="language_array">
         <item>English</item>
         <item>हिंदी</item>
     </string-array>
+    <string name="slok">Slok</string>
+    <string name="continue_reading">CONTINUE READING</string>
 </resources>

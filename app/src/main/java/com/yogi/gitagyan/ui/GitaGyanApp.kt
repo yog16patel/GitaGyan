@@ -1,6 +1,5 @@
 package com.yogi.gitagyan.ui
 
-import android.util.Log
 import androidx.compose.material3.windowsizeclass.WindowSizeClass
 import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.runtime.Composable
@@ -12,6 +11,7 @@ import com.yogi.gitagyan.Screen
 import com.yogi.gitagyan.rememberGitaGyanAppState
 import com.yogi.gitagyan.ui.chapterlist.ChapterListScreen
 import com.yogi.gitagyan.ui.slokadetails.ChapterOverviewScreen
+import com.yogi.gitagyan.ui.userhome.UserHomeScreen
 import com.yogi.gitagyan.ui.util.GitaContentType
 import com.yogi.gitagyan.ui.viewmodels.GitaGyanViewModel
 
@@ -22,7 +22,6 @@ fun GitaGyanApp(
     appState: GitaGyanAppState = rememberGitaGyanAppState(),
     viewModel: GitaGyanViewModel
 ) {
-
 
     val contentType: GitaContentType =  when(windowSize.widthSizeClass){
         WindowWidthSizeClass.Compact, WindowWidthSizeClass.Medium  -> GitaContentType.SINGLE_PANE
@@ -38,18 +37,32 @@ fun GitaGyanApp(
     ) {
         composable(Screen.SplashScreen.route) { backStackEntry ->
             SplashScreen {
-                appState.navigateToChapterList(backStackEntry) {
+                appState.navigateToUserHome(backStackEntry) {
                     popUpTo(Screen.SplashScreen.route) {
                         inclusive = true
                     }
                 }
             }
         }
+        composable(Screen.UserHomeScreen.route) { backStackEntry ->
+            UserHomeScreen(
+                viewModel = viewModel,
+                navigateToChapterList = {
+                    appState.navigateToChapterList(backStackEntry)
+                },
+                continueReading = {
+                    appState.navigateChapterOverview(backStackEntry)
+                }
+            )
+        }
         composable(Screen.ChapterList.route) { backStackEntry ->
             ChapterListScreen(
                 viewModel = viewModel,
                 navigateToNext = {
                     appState.navigateChapterOverview(backStackEntry)
+                },
+                onBackButtonPressed = {
+                    appState.navController.popBackStack()
                 }
             )
         }
@@ -65,8 +78,7 @@ fun GitaGyanApp(
                     viewModel.closeDetailScreen()
                 },
                 navigateToDetail = { index, contentType ->
-                    Log.e("Yogesh","Sloka Selection : $index")
-                    viewModel.setLastSelectedSloka(index, contentType)
+                    viewModel.setLastSelectedSloka(index, contentType, index)
                 }
             )
         }

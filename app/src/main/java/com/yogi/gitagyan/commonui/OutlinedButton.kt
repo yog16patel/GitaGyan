@@ -21,7 +21,7 @@ import com.yogi.gitagyan.ui.theme.Dimensions.gitaPadding7x
 import com.yogi.gitagyan.ui.theme.Dimensions.gitaPaddingHalf
 
 @Composable
-fun OutLinedButton(
+fun GitaOutLinedButton(
     modifier: Modifier = Modifier,
     text: String,
     border: Color,
@@ -29,7 +29,7 @@ fun OutLinedButton(
     iconAtStart: Boolean = true,
     roundedPercent: Int = 15,
     textColor: Color,
-    iconId: Painter?=null,
+    iconId: Painter? = null,
     onClick: () -> Unit
 ) {
     OutlinedButton(
@@ -72,12 +72,13 @@ fun CircleButton(
     onClick: () -> Unit
 ) {
 
-    OutlinedButton(onClick = { onClick() },
-        modifier= modifier.size(gitaPadding7x),  //avoid the oval shape
+    OutlinedButton(
+        onClick = { onClick() },
+        modifier = modifier.size(gitaPadding7x),  //avoid the oval shape
         shape = CircleShape,
-        border= BorderStroke(2.dp, border),
+        border = BorderStroke(2.dp, border),
         contentPadding = PaddingValues(0.dp),  //avoid the little icon
-        colors = ButtonDefaults.outlinedButtonColors(contentColor =  border)
+        colors = ButtonDefaults.outlinedButtonColors(contentColor = border)
     ) {
         Icon(painter = iconId, contentDescription = "content description")
     }

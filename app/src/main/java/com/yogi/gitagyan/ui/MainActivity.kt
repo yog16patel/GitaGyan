@@ -18,7 +18,7 @@ import com.google.accompanist.adaptive.calculateDisplayFeatures
 class MainActivity : AppCompatActivity() {
 
 
-     val viewModel: GitaGyanViewModel by viewModels()
+     private val viewModel: GitaGyanViewModel by viewModels()
 
     @OptIn(ExperimentalMaterial3WindowSizeClassApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {

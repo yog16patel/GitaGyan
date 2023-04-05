@@ -8,4 +8,14 @@
     <string name="chapter_number">%s</string>
     <string name="okay_lets_go">जारी रखें</string>
     <string name="choose_your_preferred_language">अपनी पसंदीदा भाषा चुनें</string>
+    <string name="namaste">नमस्ते,</string>
+    <string name="bhakt">भक्त</string>
+    <string name="current_progress">वर्तमान प्रगति</string>
+    <string name="explore_gita">गीता प्रारंभ करें</string>
+    <string name="liked_slokas">पसंद किए गए स्लोक</string>
+    <string name="chapter">अध्याय</string>
+    <string name="slok">स्लोक</string>
+    <string name="continue_reading">पढ़ना जारी राखे</string>
+    <string name="chapters">अध्याय %s</string>
+    <string name="slok_name">स्लोक %s</string>
 </resources>

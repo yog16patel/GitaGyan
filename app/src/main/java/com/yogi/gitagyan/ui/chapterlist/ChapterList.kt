@@ -37,13 +37,20 @@ import com.yogi.gitagyan.ui.appbar.AppbarState
 
 
 @Composable
-fun ChapterListScreen( viewModel: GitaGyanViewModel,navigateToNext: ()->Unit,) {
-    ChapterList(viewModel = viewModel,navigateToNext =navigateToNext)
+fun ChapterListScreen(
+    viewModel: GitaGyanViewModel,
+    navigateToNext: () -> Unit,
+    onBackButtonPressed : () -> Unit
+) {
+    ChapterList(viewModel = viewModel, navigateToNext = navigateToNext, onBackButtonPressed = onBackButtonPressed)
 }
+
 @Composable
 private fun ChapterList(
     viewModel: GitaGyanViewModel,
-    navigateToNext: ()->Unit,
+    navigateToNext: () -> Unit,
+    onBackButtonPressed : () -> Unit
+
 ) {
     val chaptersState by viewModel.chapterListPageState.collectAsState()
     viewModel.getLanguagePreference()
@@ -53,17 +60,18 @@ private fun ChapterList(
         val appbarState by remember {
             mutableStateOf(AppbarState())
         }
-        
+
         val title = if (languageState.preferredLanguage == PreferredLanguage.ENGLISH) stringResource(
-                id = R.string.chapters
+                id = R.string.chapters, ""
             )
             else stringResource(id = R.string.chapters_hindi)
         appbarState.title = title
-        
+
         ChapterList(
             chapterListPageState = chaptersState,
             languageState = languageState,
             appbarState = appbarState,
+            onBackButtonPressed = onBackButtonPressed,
             selectedLanguage = {
                 viewModel.setLanguagePreferences(it)
             },
@@ -81,7 +89,8 @@ private fun ChapterList(
     languageState: LanguageState,
     appbarState: AppbarState,
     selectedLanguage: (PreferredLanguage) -> Unit,
-    selectedChapter: (Int) -> Unit
+    selectedChapter: (Int) -> Unit,
+    onBackButtonPressed : () -> Unit
 ) {
 
     var showDialog by remember {
@@ -109,9 +118,12 @@ private fun ChapterList(
     ) {
         LazyColumn {
             item {
-                GitaTopAppBar(appbarState){
-                    showDialog = true
-                }
+                GitaTopAppBar(
+                    appbarState,
+                    backButtonClicked = { onBackButtonPressed() },
+                    actionButtonClicked = {
+                        showDialog = true
+                    })
             }
             items(chapterListPageState.chapterInfoItems.size) { i ->
                 val chapter = chapterListPageState.chapterInfoItems[i]

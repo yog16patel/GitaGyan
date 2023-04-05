@@ -11,6 +11,7 @@ import androidx.navigation.compose.rememberNavController
 
 sealed class Screen(val route: String) {
     object SplashScreen: Screen("splash_screen")
+    object UserHomeScreen: Screen("user_home_screen")
     object ChapterList : Screen("chapter_list_screen")
     object ChapterOverview : Screen("chapter_overview")
     object ChapterDetails : Screen("chapter_details/")
@@ -26,6 +27,14 @@ fun rememberGitaGyanAppState(
 class GitaGyanAppState(
     val navController: NavHostController
 ) {
+
+    fun navigateToUserHome(from: NavBackStackEntry,builder: NavOptionsBuilder.() -> Unit = {  } ){
+        if(from.lifecycleIsResumed()){
+            navController.navigate(Screen.UserHomeScreen.route){
+                builder.invoke(this)
+            }
+        }
+    }
 
     fun navigateToChapterList(from: NavBackStackEntry,builder: NavOptionsBuilder.() -> Unit = {  } ){
         if(from.lifecycleIsResumed()){

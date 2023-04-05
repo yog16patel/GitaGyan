@@ -59,7 +59,7 @@ fun ChooseLanguageDialogUi(
             selectedOptionIndex = index
         }
 
-        OutLinedButton(
+        GitaOutLinedButton(
             modifier = Modifier.padding(vertical = Dimensions.gitaPadding),
             text = stringResource(
                 id = R.string.okay_lets_go

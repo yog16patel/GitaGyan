@@ -1,8 +1,10 @@
 package com.yogi.data.di
 
 import com.yogi.data.repository.GitaGyanRepositoryImpl
+import com.yogi.data.repository.QodRepositoryImpl
 import com.yogi.data.repository.SharedPreferencesRepositoryImpl
 import com.yogi.domain.repository.GitaGyanRepository
+import com.yogi.domain.repository.QODRepository
 import com.yogi.domain.repository.SharedPreferencesRepository
 import dagger.Binds
 import dagger.Module
@@ -18,4 +20,7 @@ abstract class RepositoryModule {
 
     @Binds
     abstract fun bindSharedPreferenceRepository(sharedPreferencesRepository: SharedPreferencesRepositoryImpl): SharedPreferencesRepository
+
+    @Binds
+    abstract fun bindQODRepository(qodRepositoryImpl: QodRepositoryImpl): QODRepository
 }

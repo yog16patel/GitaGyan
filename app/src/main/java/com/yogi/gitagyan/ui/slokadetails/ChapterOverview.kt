@@ -59,6 +59,7 @@ fun ChapterOverviewScreen(
 ) {
 
     val slokaDetailsPageState by viewModel.slokaDetailsPageState.collectAsState()
+
     /**
      * When moving from LIST_AND_DETAIL page to LIST page clear the selection and user should see LIST screen.
      */
@@ -77,8 +78,9 @@ fun ChapterOverviewScreen(
                         ChapterOverviewPaneContent(
                             slokaDetailsPageState = slokaDetailsPageState,
                             onBackPressed = goBack,
+                            isContinueClicked = viewModel.isContinueReading,
                             navigateToDetail = { number, type ->
-                                viewModel.setLastSelectedSloka(number, type)
+                                viewModel.setLastSelectedSloka(number, type, number)
                             }
                         )
                     },
@@ -87,7 +89,7 @@ fun ChapterOverviewScreen(
                             slokaDetailsPageState = slokaDetailsPageState,
                             selectedSlokNumber = slokaDetailsPageState.lastSelectedSloka
                         ) { number ->
-                            viewModel.setLastSelectedSloka(number, GitaContentType.SINGLE_PANE)
+                            viewModel.setLastSelectedSloka(number, GitaContentType.SINGLE_PANE, number)
                         }
                     },
                     strategy = HorizontalTwoPaneStrategy(splitFraction = 0.5f, gapWidth = 16.dp),
@@ -121,7 +123,7 @@ fun SinglePaneContent(
             selectedSlokNumber = slokaDetailsPageState.lastSelectedSloka,
             closeDetailScreen = { closeDetailScreen() },
             selectedSlokaNumber = {number ->
-                viewModel.setLastSelectedSloka(number, GitaContentType.SINGLE_PANE)
+                viewModel.setLastSelectedSloka(number, GitaContentType.SINGLE_PANE, number)
 
             }
         )
@@ -129,6 +131,7 @@ fun SinglePaneContent(
         ChapterOverviewPaneContent(
             slokaDetailsPageState = slokaDetailsPageState,
             onBackPressed = goBack,
+            isContinueClicked = viewModel.isContinueReading,
             navigateToDetail = navigateToDetail
         )
     }
@@ -139,12 +142,16 @@ fun SinglePaneContent(
 fun ChapterOverviewPaneContent(
     slokaDetailsPageState: SlokaDetailsPageState,
     onBackPressed: () -> Unit,
+    isContinueClicked: Boolean,
     navigateToDetail: (Int, contentType: GitaContentType) -> Unit
 ) {
 
     val lazyColumnState = rememberLazyListState()
     LaunchedEffect(key1 = slokaDetailsPageState, block ={
-        lazyColumnState.animateScrollToItem(slokaDetailsPageState.lastSelectedSloka + 2)
+        lazyColumnState.animateScrollToItem(
+            if(isContinueClicked) (slokaDetailsPageState.lastSelectedSloka + 2)
+            else 0
+        )
     } )
     val slokaList = slokaDetailsPageState.chapterDetailsItems?.slokUiEntityList ?: emptyList()
     val appBarState by remember {
