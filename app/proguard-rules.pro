@@ -19,3 +19,16 @@
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
+
+-keep class com.yogi.gitagyan.data.db.model.** { *; }
+-keepclassmembers class com.yogi.domain.entities.** {
+  *;
+}
+-keep class com.yogi.domain.entities.** { *; }
+-keepattributes Signature
+-keepattributes EnclosingMethod
+-keepattributes InnerClasses
+-keepattributes Annotation
+-keepclassmembers class com.google.firebase.database.GenericTypeIndicator { *; }
+-keepnames class * extends android.os.Parcelable
+-keepnames class * extends java.io.Serializable
