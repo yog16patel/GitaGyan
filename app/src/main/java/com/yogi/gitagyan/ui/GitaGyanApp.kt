@@ -1,5 +1,6 @@
 package com.yogi.gitagyan.ui
 
+import android.util.Log
 import androidx.compose.material3.windowsizeclass.WindowSizeClass
 import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.runtime.Composable
@@ -78,6 +79,7 @@ fun GitaGyanApp(
                     viewModel.closeDetailScreen()
                 },
                 navigateToDetail = { index, contentType ->
+                    Log.e("Yogesh","Index : $index")
                     viewModel.setLastSelectedSloka(index, contentType, index)
                 }
             )
