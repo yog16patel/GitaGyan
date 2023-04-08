@@ -13,6 +13,7 @@ import com.yogi.gitagyan.ui.slokadetails.SlokaDetailsPageState
 import com.yogi.gitagyan.ui.chapterlist.ChapterListPageState
 import com.yogi.domain.entities.PreferredLanguage
 import com.yogi.domain.interactors.GetCurrentStateInteractor
+import com.yogi.domain.interactors.GetNumberOfSlokaInteractor
 import com.yogi.domain.interactors.QODInteractor
 import com.yogi.domain.interactors.SetLastReadSlokaAndChapterIndexValueInteractor
 import com.yogi.domain.interactors.SetLastReadSlokaAndChapterNameInteractor
@@ -33,6 +34,7 @@ class GitaGyanViewModel @Inject constructor(
     private val getChapterListInteractor: GetChapterListInteractor,
     private val getSlokaDetailsInteractor: GetSlokaDetailsInteractor,
     private val getCurrentState: GetCurrentStateInteractor,
+    private val getNumberOfSlokaInteractor: GetNumberOfSlokaInteractor,
     private val qodInteractor: QODInteractor,
     private val sharedPreferencesRepository: SharedPreferencesRepository,
     private val setLastReadSlokaAndChapterIndexName: SetLastReadSlokaAndChapterNameInteractor,
@@ -48,7 +50,7 @@ class GitaGyanViewModel @Inject constructor(
         get() = _slokaDetailsPageState
 
     private val _qodState = MutableStateFlow<String?>("")
-    val qodState : StateFlow<String?>
+    val qodState: StateFlow<String?>
         get() = _qodState
 
     private val _currentState = MutableStateFlow(CurrentState())
@@ -59,7 +61,7 @@ class GitaGyanViewModel @Inject constructor(
     val languageState: StateFlow<LanguageState>
         get() = _languageState
 
-    var isContinueReading : Boolean = false
+    var isContinueReading: Boolean = false
         private set
 
 
@@ -70,9 +72,9 @@ class GitaGyanViewModel @Inject constructor(
         getChapterList()
     }
 
-    private fun getQOD(){
+    private fun getQOD() {
         viewModelScope.launch {
-           _qodState.value = qodInteractor.executeSync(Unit)
+            _qodState.value = qodInteractor.executeSync(Unit)
         }
     }
 
@@ -114,9 +116,10 @@ class GitaGyanViewModel @Inject constructor(
         }
     }
 
-    fun exploreGita(){
+    fun exploreGita() {
         isContinueReading = false
     }
+
     fun continueReading(chapterNumber: Int, slokNumber: Int) {
         isContinueReading = true
         slokaDetailsPageState.value.lastSelectedSloka = slokNumber
@@ -124,6 +127,7 @@ class GitaGyanViewModel @Inject constructor(
     }
 
     fun updateSelectedChapter(chapterNumber: Int) {
+        updateSlokList(chapterNumber)
         chapterListPageState.value.selectedChapter = chapterNumber
         _slokaDetailsPageState.update {
             it.copy(isLoading = true)
@@ -176,12 +180,12 @@ class GitaGyanViewModel @Inject constructor(
             )
         viewModelScope.launch {
             _slokaDetailsPageState.value.chapterDetailsItems?.run {
-                val splitted =  slokUiEntityList[slokaIndex].slokaNumber.split(" ")
+                val splitted = slokUiEntityList[slokaIndex].slokaNumber.split(" ")
 
                 setLastReadSlokaAndChapterIndexName.executeSync(
                     GitaPair(
-                        chapterTitle ,
-                        if(splitted.size >= 2) splitted[1] else slokUiEntityList[slokaIndex].slokaNumber
+                        chapterTitle,
+                        if (splitted.size >= 2) splitted[1] else slokUiEntityList[slokaIndex].slokaNumber
                     )
                 )
                 setLastReadSlokaAndChapterIndexValueInteractor.executeSync(
@@ -192,6 +196,17 @@ class GitaGyanViewModel @Inject constructor(
                 )
                 getCurrentProgress()
             }
+        }
+    }
+
+    private fun updateSlokList(chapterNumber: Int) {
+        viewModelScope.launch {
+            val response = getNumberOfSlokaInteractor.executeSync(chapterNumber)
+            _slokaDetailsPageState.value =
+                slokaDetailsPageState.value.copy(totalSlokaList = response?.let {
+                    (1..it).toList()
+                } ?: emptyList()
+                )
         }
     }
 

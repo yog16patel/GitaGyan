@@ -13,11 +13,12 @@ import com.yogi.gitagyan.ui.theme.Dimensions
 @Composable
 fun GitaAlertDialogNew (
     dialogOpen: Boolean,
-    content: @Composable ()->Unit
+    content: @Composable ()->Unit,
+    onDismiss : () -> Unit = {}
 ) {
 
     if(dialogOpen) {
-        Dialog(onDismissRequest = {}) {
+        Dialog(onDismissRequest = onDismiss) {
             Box(
                 modifier = Modifier
                     .background(Background)

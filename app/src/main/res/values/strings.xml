@@ -22,5 +22,6 @@
         <item>हिंदी</item>
     </string-array>
     <string name="slok">Slok</string>
+    <string name="select_slok">Select Slok</string>
     <string name="continue_reading">CONTINUE READING</string>
 </resources>

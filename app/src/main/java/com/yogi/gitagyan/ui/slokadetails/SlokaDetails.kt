@@ -1,5 +1,6 @@
 package com.yogi.gitagyan.ui.slokadetails
 
+import android.util.Log
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -44,6 +45,8 @@ import com.yogi.gitagyan.commonui.GitaLinearProgressBar
 import com.yogi.gitagyan.commonui.GitaProgressbarState
 import com.yogi.gitagyan.ui.appbar.AppbarState
 import com.yogi.gitagyan.ui.theme.Dimensions.gitaPadding6x
+import com.yogi.gitagyan.ui.util.mapToSlokaIndexToAppSlokaNumber
+import com.yogi.gitagyan.ui.util.mapToSlokaNumberWithTheAppSlokaIndex
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -54,24 +57,53 @@ fun SlokaDetailsScreen(
     closeDetailScreen: () -> Unit = {},
     selectedSlokaNumber: (Int) -> Unit
 ) {
+    val coroutineScope = rememberCoroutineScope()
+    val chapterInfo = slokaDetailsPageState.chapterDetailsItems
+    val list = chapterInfo?.slokUiEntityList ?: emptyList()
+
     val appState by remember {
         mutableStateOf(AppbarState())
     }
 
-    val pagerState by remember (key1 = selectedSlokNumber) {
-       mutableStateOf(PagerState(initialPage = selectedSlokNumber))
+    var pagerState by remember(key1 = selectedSlokNumber) {
+        mutableStateOf(PagerState(initialPage = selectedSlokNumber))
     }
 
-    val coroutineScope = rememberCoroutineScope()
-    val chapterInfo = slokaDetailsPageState.chapterDetailsItems
-    val list = chapterInfo?.slokUiEntityList ?: emptyList()
+    LaunchedEffect(key1 = Unit) {
+        pagerState.scrollToPage(selectedSlokNumber)
+    }
+
     val listSize = if (list.isNotEmpty()) list.size else 1
 
+    var selectedSlokIndexNumber by remember {
+        mutableStateOf(list.mapToSlokaIndexToAppSlokaNumber(selectedSlokNumber))
+    }
     var progressbarState by remember {
         mutableStateOf(GitaProgressbarState())
     }
     var currentItem by remember {
         mutableStateOf(slokaDetailsPageState.lastSelectedSloka)
+    }
+    var showGotoSlokDialog by remember {
+        mutableStateOf(false)
+    }
+
+    if (showGotoSlokDialog) {
+        GotoSlokComposableDialog(
+            showDialog = showGotoSlokDialog,
+            selectedSloka = selectedSlokIndexNumber,
+            slokaNumber = slokaDetailsPageState.totalSlokaList,
+            onDismiss = {
+                showGotoSlokDialog = false
+            },
+            onItemSelected = {
+                selectedSlokIndexNumber = it
+                coroutineScope.launch {
+                    pagerState.scrollToPage(list.mapToSlokaNumberWithTheAppSlokaIndex(it))
+                }
+                showGotoSlokDialog = false
+            }
+        )
     }
 
     progressbarState = progressbarState.copy(
@@ -92,9 +124,16 @@ fun SlokaDetailsScreen(
     }
 
     Column {
-        GitaCenterAlignedTopAppBar(appBarState = appState) {
-            closeDetailScreen()
-        }
+        GitaCenterAlignedTopAppBar(
+            appBarState = appState,
+            showActionButton = true,
+            backButtonClicked = {
+                closeDetailScreen()
+            },
+            actionButtonClicked = {
+                showGotoSlokDialog = true
+            })
+
         GitaLinearProgressBar(
             progressbarState = progressbarState
         )
@@ -114,6 +153,8 @@ fun SlokaDetailsScreen(
                 previousClicked = {
                     coroutineScope.launch {
                         if (pagerState.currentPage > 0) {
+                            selectedSlokIndexNumber =
+                                list.mapToSlokaIndexToAppSlokaNumber(pagerState.currentPage - 1)
                             pagerState.animateScrollToPage(pagerState.currentPage - 1)
                             selectedSlokaNumber(pagerState.currentPage)
                         }
@@ -122,7 +163,9 @@ fun SlokaDetailsScreen(
                 },
                 nextClicked = {
                     coroutineScope.launch {
-                        if (pagerState.currentPage < list.size - 1){
+                        if (pagerState.currentPage < list.size - 1) {
+                            selectedSlokIndexNumber =
+                                list.mapToSlokaIndexToAppSlokaNumber(pagerState.currentPage + 1)
                             pagerState.animateScrollToPage(pagerState.currentPage + 1)
                             selectedSlokaNumber(pagerState.currentPage)
                         }
@@ -144,7 +187,7 @@ private fun SlokaComposable(
     sloka: String,
     previousClicked: () -> Unit,
     nextClicked: () -> Unit,
-    ) {
+) {
 
     val scrollState = rememberScrollState()
     Box(

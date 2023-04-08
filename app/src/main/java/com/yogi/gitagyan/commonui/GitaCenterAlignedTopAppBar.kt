@@ -2,6 +2,7 @@ package com.yogi.gitagyan.commonui
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.List
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -17,7 +18,9 @@ import com.yogi.gitagyan.ui.theme.Black
 @Composable
 fun GitaCenterAlignedTopAppBar(
     appBarState: AppbarState,
-    backButtonClicked : ()->Unit
+    showActionButton: Boolean = false,
+    backButtonClicked : ()->Unit,
+    actionButtonClicked: () -> Unit = {}
 ) {
     CenterAlignedTopAppBar(
         title = {
@@ -36,6 +39,19 @@ fun GitaCenterAlignedTopAppBar(
                     contentDescription = "Back",
                     tint = Black
                 )
+            }
+        },
+        actions = {
+            if(showActionButton) {
+                IconButton(onClick = {
+                    actionButtonClicked()
+                }) {
+                    Icon(
+                        imageVector = Icons.Filled.List,
+                        contentDescription = "Back",
+                        tint = Black
+                    )
+                }
             }
         },
         colors = TopAppBarDefaults.smallTopAppBarColors(containerColor = Background)

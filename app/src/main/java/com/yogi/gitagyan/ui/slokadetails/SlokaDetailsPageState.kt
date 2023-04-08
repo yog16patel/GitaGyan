@@ -6,5 +6,6 @@ data class SlokaDetailsPageState(
     val chapterDetailsItems: ChapterDetailItemUi? = null,
     var lastSelectedSloka: Int = 1,
     var isDetailOpen: Boolean = false,
+    var totalSlokaList: List<Int> = emptyList(),
     val isLoading:Boolean = false
 )

@@ -3,6 +3,7 @@ package com.yogi.data.repository
 import com.yogi.domain.core.Result
 import com.yogi.domain.firebase.FirebaseDatabaseInterface
 import com.yogi.domain.entities.PreferredLanguage
+import com.yogi.domain.localinfo.slokaNumberInChapterMap
 import com.yogi.domain.models.ChapterDetailItem
 import com.yogi.domain.models.ChapterInfoItem
 import com.yogi.domain.models.Slok
@@ -62,4 +63,9 @@ class GitaGyanRepositoryImpl @Inject constructor(
             Result.Error(e.message ?: "Exception")
         }
     }
+
+    override suspend fun getNumberOfSloka(chapterNumber: Int): Int? {
+        return slokaNumberInChapterMap[chapterNumber]
+    }
+
 }

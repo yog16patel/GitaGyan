@@ -17,7 +17,9 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.ripple.rememberRipple
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -89,7 +91,11 @@ fun ChapterOverviewScreen(
                             slokaDetailsPageState = slokaDetailsPageState,
                             selectedSlokNumber = slokaDetailsPageState.lastSelectedSloka
                         ) { number ->
-                            viewModel.setLastSelectedSloka(number, GitaContentType.SINGLE_PANE, number)
+                            viewModel.setLastSelectedSloka(
+                                number,
+                                GitaContentType.SINGLE_PANE,
+                                number
+                            )
                         }
                     },
                     strategy = HorizontalTwoPaneStrategy(splitFraction = 0.5f, gapWidth = 16.dp),
@@ -122,7 +128,7 @@ fun SinglePaneContent(
             slokaDetailsPageState = slokaDetailsPageState,
             selectedSlokNumber = slokaDetailsPageState.lastSelectedSloka,
             closeDetailScreen = { closeDetailScreen() },
-            selectedSlokaNumber = {number ->
+            selectedSlokaNumber = { number ->
                 viewModel.setLastSelectedSloka(number, GitaContentType.SINGLE_PANE, number)
 
             }
@@ -138,6 +144,7 @@ fun SinglePaneContent(
 }
 
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ChapterOverviewPaneContent(
     slokaDetailsPageState: SlokaDetailsPageState,
@@ -147,12 +154,12 @@ fun ChapterOverviewPaneContent(
 ) {
 
     val lazyColumnState = rememberLazyListState()
-    LaunchedEffect(key1 = slokaDetailsPageState, block ={
+    LaunchedEffect(key1 = slokaDetailsPageState, block = {
         lazyColumnState.animateScrollToItem(
-            if(isContinueClicked) (slokaDetailsPageState.lastSelectedSloka + 2)
+            if (isContinueClicked) (slokaDetailsPageState.lastSelectedSloka + 1)
             else 0
         )
-    } )
+    })
     val slokaList = slokaDetailsPageState.chapterDetailsItems?.slokUiEntityList ?: emptyList()
     val appBarState by remember {
         mutableStateOf(AppbarState())
@@ -162,73 +169,79 @@ fun ChapterOverviewPaneContent(
         mutableStateOf(false)
     }
 
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-
-        LazyColumn(
-            state = lazyColumnState,
-            modifier = Modifier.padding(
-                start = Dimensions.gitaPadding,
-                end = Dimensions.gitaPadding,
-
-            )
-        ) {
-            item {
-                GitaCenterAlignedTopAppBar(appBarState = appBarState) {
+    Scaffold(
+        topBar = {
+            GitaCenterAlignedTopAppBar(
+                appBarState = appBarState,
+                backButtonClicked = {
                     onBackPressed()
+                })
+        }, content = { innerPadding ->
+
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier.padding(innerPadding)
+            ) {
+
+                LazyColumn(
+                    state = lazyColumnState,
+                    modifier = Modifier.padding(
+                        start = Dimensions.gitaPadding,
+                        end = Dimensions.gitaPadding,
+
+                        )
+                ) {
+                    item {
+                        TextComponentDevnagri(
+                            modifier = Modifier
+                                .padding(
+                                    vertical = Dimensions.gitaPadding,
+                                    horizontal = Dimensions.gitaPadding
+                                )
+                                .fillMaxWidth(),
+                            text = slokaDetailsPageState.chapterDetailsItems?.chapterTitle ?: "",
+                            fontSize = 16.sp,
+                            textAlign = TextAlign.Center,
+                            lineHeight = 25.sp,
+                            fontWeight = FontWeight.SemiBold
+                        )
+                        TextComponentDevnagri(
+                            modifier = Modifier
+                                .padding(start = Dimensions.gitaPadding)
+                                .fillMaxWidth()
+                                .animateContentSize(
+                                    animationSpec = spring(
+                                        dampingRatio = Spring.DampingRatioLowBouncy,
+                                        stiffness = Spring.StiffnessLow
+                                    )
+                                )
+                                .clickable() {
+                                    expand = !expand
+                                },
+                            fontSize = 16.sp,
+                            text = slokaDetailsPageState.chapterDetailsItems?.description ?: "",
+                            lineHeight = 25.sp,
+                            maxLines = if (!expand) 3 else Int.MAX_VALUE
+                        )
+                        TextComponent(
+                            text = if (!expand) "Show More ⬇" else "Show Less ⬆",
+                            modifier = Modifier
+                                .padding(start = Dimensions.gitaPadding)
+                                .clickable {
+                                    expand = !expand
+                                },
+                            fontWeight = FontWeight.SemiBold,
+                            color = Saffron
+                        )
+                    }
+                    items(slokaList.size) { index ->
+                        OverviewSingleItem(slokUi = slokaList[index], index = index) {
+                            navigateToDetail(it, GitaContentType.SINGLE_PANE)
+                        }
+                    }
                 }
             }
-            item {
-                TextComponentDevnagri(
-                    modifier = Modifier
-                        .padding(
-                            vertical = Dimensions.gitaPadding,
-                            horizontal = Dimensions.gitaPadding
-                        )
-                        .fillMaxWidth(),
-                    text = slokaDetailsPageState.chapterDetailsItems?.chapterTitle ?: "",
-                    fontSize = 16.sp,
-                    textAlign = TextAlign.Center,
-                    lineHeight = 25.sp,
-                    fontWeight = FontWeight.SemiBold
-                )
-                TextComponentDevnagri(
-                    modifier = Modifier
-                        .padding(start = Dimensions.gitaPadding)
-                        .fillMaxWidth()
-                        .animateContentSize(
-                            animationSpec = spring(
-                                dampingRatio = Spring.DampingRatioLowBouncy,
-                                stiffness = Spring.StiffnessLow
-                            )
-                        )
-                        .clickable() {
-                            expand = !expand
-                        },
-                    fontSize = 16.sp,
-                    text = slokaDetailsPageState.chapterDetailsItems?.description ?: "",
-                    lineHeight = 25.sp,
-                    maxLines = if (!expand) 3 else Int.MAX_VALUE
-                )
-                TextComponent(
-                    text = if (!expand) "Show More ⬇" else "Show Less ⬆",
-                    modifier = Modifier
-                        .padding(start = Dimensions.gitaPadding)
-                        .clickable {
-                            expand = !expand
-                        },
-                    fontWeight = FontWeight.SemiBold,
-                    color = Saffron
-                )
-            }
-            items(slokaList.size) { index ->
-                OverviewSingleItem(slokUi = slokaList[index], index = index) {
-                    navigateToDetail(it, GitaContentType.SINGLE_PANE)
-                }
-            }
-        }
-    }
+        })
 }
 
 @Composable

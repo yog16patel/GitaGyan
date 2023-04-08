@@ -7,4 +7,5 @@ import com.yogi.domain.models.ChapterInfoItem
 interface GitaGyanRepository {
     suspend fun getChapterList(): Result<List<ChapterInfoItem>>
     suspend fun getChapterDetails(chapterNumber: String): Result<ChapterDetailItem?>?
+    suspend fun getNumberOfSloka(chapterNumber: Int): Int?
 }

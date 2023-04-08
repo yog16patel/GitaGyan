@@ -38,6 +38,7 @@ import com.yogi.gitagyan.R
 import com.yogi.gitagyan.commonui.ChooseLanguageDialogUi
 import com.yogi.gitagyan.commonui.GitaAlertDialogNew
 import com.yogi.gitagyan.commonui.GitaAppBarUserHomeScreen
+import com.yogi.gitagyan.ui.theme.Black
 import com.yogi.gitagyan.ui.theme.Dimensions.gitaPadding3x
 import com.yogi.gitagyan.ui.theme.LikedSlokaBackground
 import com.yogi.gitagyan.ui.viewmodels.GitaGyanViewModel
@@ -59,7 +60,7 @@ fun UserHomeScreen(
     val defaultSelectedIem = languageArray[languageState.preferredLanguage.index]
 
     if (showDialog) {
-        GitaAlertDialogNew(dialogOpen = true) {
+        GitaAlertDialogNew(dialogOpen = true, content = {
             ChooseLanguageDialogUi(
                 items = languageArray,
                 defaultSelectedIem = defaultSelectedIem,
@@ -69,7 +70,7 @@ fun UserHomeScreen(
                     showDialog = false
                 }
             )
-        }
+        })
     }
 
     Column {
@@ -207,7 +208,7 @@ fun CurrentProgress(
             }
             LinearProgressIndicator(
                 progress = currentProgressFloat / 100,
-                color = Color.White,
+                color = Black,
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(
