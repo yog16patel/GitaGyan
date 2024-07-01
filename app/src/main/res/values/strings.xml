@@ -23,5 +23,12 @@
     </string-array>
     <string name="slok">Slok</string>
     <string name="select_slok">Select Slok</string>
+    <string name="select_chapter">Select Chapter</string>
     <string name="continue_reading">CONTINUE READING</string>
+
+    <string name="cd_play" translatable="false">Play</string>
+    <string name="cd_skip_previous" translatable="false">Skip previous</string>
+    <string name="cd_reply10" translatable="false">Reply 10 seconds</string>
+    <string name="cd_forward30" translatable="false">Forward 30 seconds</string>
+    <string name="cd_skip_next" translatable="false">Skip next</string>
 </resources>

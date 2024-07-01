@@ -1,4 +1,4 @@
-package com.yogi.gitagyan.ui.viewmodels
+package com.yogi.gitagyan.ui.slokadetails
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
@@ -7,21 +7,16 @@ import com.yogi.domain.core.GitaPair
 import com.yogi.domain.core.Result
 import com.yogi.domain.interactors.GetChapterListInteractor
 import com.yogi.domain.interactors.GetSlokaDetailsInteractor
-import com.yogi.domain.repository.SharedPreferencesRepository
 import com.yogi.gitagyan.LanguageState
-import com.yogi.gitagyan.ui.slokadetails.SlokaDetailsPageState
 import com.yogi.gitagyan.ui.chapterlist.ChapterListPageState
-import com.yogi.domain.entities.PreferredLanguage
-import com.yogi.domain.interactors.GetCurrentStateInteractor
 import com.yogi.domain.interactors.GetNumberOfSlokaInteractor
-import com.yogi.domain.interactors.QODInteractor
 import com.yogi.domain.interactors.SetLastReadSlokaAndChapterIndexValueInteractor
 import com.yogi.domain.interactors.SetLastReadSlokaAndChapterNameInteractor
-import com.yogi.gitagyan.LanguageChangeUtil
-import com.yogi.gitagyan.ui.CurrentState
 import com.yogi.gitagyan.ui.mappers.toChapterDetailItemUi
 import com.yogi.gitagyan.ui.mappers.toChapterInfoItemUiList
 import com.yogi.gitagyan.ui.util.GitaContentType
+import com.yogi.gitagyan.ui.util.mapToSlokaIndexToAppSlokaNumber
+import com.yogi.gitagyan.ui.util.mapToSlokaNumberWithTheAppSlokaIndex
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -33,14 +28,14 @@ import javax.inject.Inject
 class GitaGyanViewModel @Inject constructor(
     private val getChapterListInteractor: GetChapterListInteractor,
     private val getSlokaDetailsInteractor: GetSlokaDetailsInteractor,
-    private val getCurrentState: GetCurrentStateInteractor,
     private val getNumberOfSlokaInteractor: GetNumberOfSlokaInteractor,
-    private val qodInteractor: QODInteractor,
-    private val sharedPreferencesRepository: SharedPreferencesRepository,
     private val setLastReadSlokaAndChapterIndexName: SetLastReadSlokaAndChapterNameInteractor,
     private val setLastReadSlokaAndChapterIndexValueInteractor: SetLastReadSlokaAndChapterIndexValueInteractor
 ) : ViewModel() {
-
+    
+    private val _languageState = MutableStateFlow(LanguageState())
+    val languageState: StateFlow<LanguageState>
+        get() = _languageState
     private val _chapterListPageState = MutableStateFlow(ChapterListPageState(isLoading = true))
     val chapterListPageState: StateFlow<ChapterListPageState>
         get() = _chapterListPageState
@@ -49,48 +44,8 @@ class GitaGyanViewModel @Inject constructor(
     val slokaDetailsPageState: StateFlow<SlokaDetailsPageState>
         get() = _slokaDetailsPageState
 
-    private val _qodState = MutableStateFlow<String?>("")
-    val qodState: StateFlow<String?>
-        get() = _qodState
-
-    private val _currentState = MutableStateFlow(CurrentState())
-    val currentState: StateFlow<CurrentState>
-        get() = _currentState
-
-    private val _languageState = MutableStateFlow(LanguageState())
-    val languageState: StateFlow<LanguageState>
-        get() = _languageState
-
-    var isContinueReading: Boolean = false
-        private set
-
-
     init {
-        getQOD()
-        getCurrentProgress()
-        getLanguagePreference()
         getChapterList()
-    }
-
-    private fun getQOD() {
-        viewModelScope.launch {
-            _qodState.value = qodInteractor.executeSync(Unit)
-        }
-    }
-
-
-    private fun getCurrentProgress() {
-        viewModelScope.launch {
-            val response = getCurrentState.executeSync(Unit)
-            _currentState.value = CurrentState(
-                selectedChapterString = response.selectedChapterString,
-                lastSlokString = response.lastSlokString,
-                selectedChapterIndex = response.selectedChapterIndex,
-                selectedSlokIndex = response.selectedSlokIndex,
-                currentProgress = response.currentProgress,
-                likedSloka = 0
-            )
-        }
     }
 
     private fun getChapterList() {
@@ -116,12 +71,7 @@ class GitaGyanViewModel @Inject constructor(
         }
     }
 
-    fun exploreGita() {
-        isContinueReading = false
-    }
-
     fun continueReading(chapterNumber: Int, slokNumber: Int) {
-        isContinueReading = true
         slokaDetailsPageState.value.lastSelectedSloka = slokNumber
         updateSelectedChapter(chapterNumber)
     }
@@ -157,25 +107,10 @@ class GitaGyanViewModel @Inject constructor(
             }
         }
     }
-
-    fun setLanguagePreferences(preferredLanguage: PreferredLanguage) {
-        LanguageChangeUtil.applyLanguage(preferredLanguage.languageCode)
-        _languageState.value = _languageState.value.copy(preferredLanguage = preferredLanguage)
-        sharedPreferencesRepository.saveLanguageToSharedPref(preferredLanguage)
-        getChapterList()
-    }
-
-    fun getLanguagePreference() {
-        val savedLanguage = sharedPreferencesRepository.getLanguageFromSharedPref()
-        savedLanguage?.let {
-            _languageState.value = _languageState.value.copy(preferredLanguage = savedLanguage)
-        }
-    }
-
-    fun setLastSelectedSloka(slokNumber: Int, contentType: GitaContentType, slokaIndex: Int) {
+    fun setLastSelectedSloka(slokaIndex: Int, contentType: GitaContentType = GitaContentType.SINGLE_PANE ) {
         _slokaDetailsPageState.value =
             _slokaDetailsPageState.value.copy(
-                lastSelectedSloka = slokNumber,
+                lastSelectedSloka = slokaIndex,
                 isDetailOpen = contentType == GitaContentType.SINGLE_PANE
             )
         viewModelScope.launch {
@@ -194,7 +129,6 @@ class GitaGyanViewModel @Inject constructor(
                         slokaIndex
                     )
                 )
-                getCurrentProgress()
             }
         }
     }
@@ -225,5 +159,18 @@ class GitaGyanViewModel @Inject constructor(
                 lastSelectedSloka = _slokaDetailsPageState.value.lastSelectedSloka
             )
     }
+
+    fun goToSelectedSloka(index: Int) {
+        val chapterInfo = _slokaDetailsPageState.value.chapterDetailsItems
+        val list = chapterInfo?.slokUiEntityList ?: emptyList()
+        setLastSelectedSloka(list.mapToSlokaNumberWithTheAppSlokaIndex(index))
+    }
+
+    fun getLastSelectedSloka(selectedSlokNumber: Int) : Int{
+        val chapterInfo = _slokaDetailsPageState.value.chapterDetailsItems
+        val list = chapterInfo?.slokUiEntityList ?: emptyList()
+        return list.mapToSlokaIndexToAppSlokaNumber(selectedSlokNumber)
+    }
+
 
 }

@@ -5,6 +5,6 @@ data class CurrentState(
     val lastSlokString: String = "",
     val selectedChapterIndex: Int = 0,
     val selectedSlokIndex: Int = 0,
-    val currentProgress: String = "",
+    val currentProgress: String = "0.0",
     val likedSloka: Int = 0
 )

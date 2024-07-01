@@ -19,10 +19,7 @@ class QodRepositoryImpl @Inject constructor(): QODRepository {
         10 to "The senses are superior to the gross body, and superior to the senses is the mind. Beyond the mind is the intellect, and even beyond the intellect is the soul. BG: 3-42"
     )
 
-    override fun getQOD(): String? {
-        val random = (0..quoteMap.size).random()
-        Log.e("Yogesh: ","Random number : $random")
-        return quoteMap[random]
-    }
+    override fun getQOD(): String? = quoteMap[(1 until quoteMap.size).random()]
+
 
 }

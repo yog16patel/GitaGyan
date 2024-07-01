@@ -2,6 +2,7 @@ package com.yogi.gitagyan.ui.userhome
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
@@ -10,6 +11,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -20,6 +22,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
@@ -41,15 +44,19 @@ import com.yogi.gitagyan.commonui.GitaAppBarUserHomeScreen
 import com.yogi.gitagyan.ui.theme.Black
 import com.yogi.gitagyan.ui.theme.Dimensions.gitaPadding3x
 import com.yogi.gitagyan.ui.theme.LikedSlokaBackground
-import com.yogi.gitagyan.ui.viewmodels.GitaGyanViewModel
+import com.yogi.gitagyan.ui.theme.MusicSlokaBackground
 
 @Composable
 fun UserHomeScreen(
-    viewModel: GitaGyanViewModel,
+    viewModel: UserHomeScreenViewModel,
     navigateToChapterList: () -> Unit,
-    continueReading: () -> Unit
+    continueReading: (chapterNumber: Int, slokNumber: Int   ) -> Unit,
+    onMusicClicked: () -> Unit
 ) {
 
+    LaunchedEffect(key1 = true) {
+        viewModel.loadFreshData()
+    }
     val currentState = viewModel.currentState.collectAsState()
     var showDialog by remember {
         mutableStateOf(false)
@@ -87,17 +94,15 @@ fun UserHomeScreen(
             currentState.value.lastSlokString,
             continueReading = {
                 currentState.value.run {
-                    viewModel.continueReading(
-                        chapterNumber = selectedChapterIndex,
-                        slokNumber = selectedSlokIndex
+                    continueReading(
+                        selectedChapterIndex,
+                        selectedSlokIndex
                     )
                 }
-                continueReading()
             }
         )
 
         ExploreGita(exporeGitaClicked = {
-            viewModel.exploreGita()
             navigateToChapterList()
         })
     }
@@ -109,7 +114,7 @@ fun QuoteBox(modifier: Modifier = Modifier, qod: String) {
     Box(
         modifier = modifier
             .fillMaxWidth()
-            .height(250.dp)
+            .height(180.dp)
             .padding(gitaPadding2x)
             .clip(RoundedCornerShape(10.dp))
             .background(Saffron.copy(alpha = 0.2F)),
@@ -234,6 +239,66 @@ fun CurrentProgress(
     }
 }
 
+@Composable
+fun MusicWidget(
+    musicWidgetClicked : ()-> Unit
+) {
+    BoxWithConstraints(
+        modifier = Modifier
+            .padding(start = gitaPadding2x, end = gitaPadding2x)
+            .clip(RoundedCornerShape(10.dp))
+            .background(MusicSlokaBackground)
+            .clickable {
+                musicWidgetClicked()
+            }
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(100.dp)
+                .padding(gitaPadding2x)
+        ) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .align(Alignment.TopStart),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                TextComponent(text = "Bhajan.....", fontWeight = FontWeight.SemiBold, color = TextWhite)
+                Icon(
+                    painter = painterResource(id = R.drawable.ic_music),
+                    contentDescription = "Music Icon",
+                    tint = TextWhite
+                )
+            }
+            Row(
+                modifier = Modifier
+                    .wrapContentSize()
+                    .align(Alignment.Center),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Icon(
+                    imageVector = ImageVector.vectorResource(id = R.drawable.ic_previous),
+                    contentDescription = "Previous Icon",
+                    tint = TextWhite,
+                    modifier = Modifier.padding(gitaPadding)
+                )
+                Icon(
+                    imageVector = ImageVector.vectorResource(id = R.drawable.ic_paused),
+                    contentDescription = "Pause Icon",
+                    tint = TextWhite,
+                    modifier = Modifier.padding(gitaPadding)
+                )
+                Icon(
+                    imageVector = ImageVector.vectorResource(id = R.drawable.ic_next),
+                    contentDescription = "Next Icon",
+                    tint = TextWhite,
+                    modifier = Modifier.padding(gitaPadding)
+                )
+            }
+        }
+    }
+}
 
 @Composable
 fun LikedSlokas(

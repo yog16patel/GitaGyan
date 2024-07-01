@@ -5,5 +5,7 @@ import androidx.compose.runtime.Composable
 
 data class AppbarState(
     var title: String = "",
+    var showBackButton: Boolean = true,
+    var showActionButton: Boolean = false,
     var action: (@Composable RowScope.()->Unit)? = null
 )

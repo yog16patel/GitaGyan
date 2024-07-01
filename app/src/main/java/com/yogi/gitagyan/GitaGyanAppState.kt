@@ -6,15 +6,20 @@ import androidx.lifecycle.Lifecycle
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavHostController
 import androidx.navigation.NavOptionsBuilder
+import androidx.navigation.NavType
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 
 
 sealed class Screen(val route: String) {
     object SplashScreen: Screen("splash_screen")
     object UserHomeScreen: Screen("user_home_screen")
     object ChapterList : Screen("chapter_list_screen")
-    object ChapterOverview : Screen("chapter_overview")
-    object ChapterDetails : Screen("chapter_details/")
+    object ChapterOverview : Screen("chapter_overview") {
+        val withNavItems = "$route/{chNumber}/{slockNumber}"
+    }
+    object ChapterDetails : Screen("chapter_details")
+    object MusicPlayer : Screen("music_player")
 }
 
 @Composable
@@ -44,9 +49,15 @@ class GitaGyanAppState(
         }
     }
 
-    fun navigateChapterOverview(from: NavBackStackEntry){
+    fun navigateChapterOverview(from: NavBackStackEntry, chNumber: Int, slockNumber: Int){
+        if(from.lifecycleIsResumed()) {
+            navController.navigate("${Screen.ChapterOverview.route}/$chNumber/$slockNumber")
+        }
+    }
+
+    fun navigateMusicPlayer(from: NavBackStackEntry){
         if(from.lifecycleIsResumed()){
-            navController.navigate(Screen.ChapterOverview.route)
+            navController.navigate(Screen.MusicPlayer.route)
         }
 
     }

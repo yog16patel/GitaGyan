@@ -3,6 +3,7 @@ package com.yogi.gitagyan.di
 import android.content.Context
 import android.content.SharedPreferences
 import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.storage.FirebaseStorage
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -16,6 +17,11 @@ class GitaAppModule {
     @Provides
     fun firebaseDatabase(): FirebaseDatabase {
         return FirebaseDatabase.getInstance()
+    }
+
+    @Provides
+    fun firebaseDataStore(): FirebaseStorage{
+        return FirebaseStorage.getInstance()
     }
 
     @Provides

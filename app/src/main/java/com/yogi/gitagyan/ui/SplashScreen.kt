@@ -35,6 +35,7 @@ fun SplashScreen(
         LaunchedEffect(key1 = true){
             finished()
         }
+
         Image(painter = painterResource(id = R.drawable.gita_gayan_launcher_icon), contentDescription = "")
         TextComponentDevnagri(
             text = stringResource(id = R.string.splash_title_name).uppercase(),

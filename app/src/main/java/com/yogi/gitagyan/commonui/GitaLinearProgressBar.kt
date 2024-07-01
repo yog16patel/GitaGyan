@@ -15,7 +15,7 @@ import com.yogi.gitagyan.ui.theme.Saffron
 
 @Composable
 fun GitaLinearProgressBar(
-    progressbarState: GitaProgressbarState
+    progressbarState: GitaProgressbarState = GitaProgressbarState()
 ) {
     var progress by remember {
         mutableStateOf(0.0f)

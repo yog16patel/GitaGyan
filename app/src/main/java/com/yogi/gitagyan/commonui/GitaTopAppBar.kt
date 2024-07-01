@@ -23,19 +23,22 @@ import com.yogi.gitagyan.ui.theme.Dimensions
 @Composable
 fun GitaTopAppBar(
     appBarState: AppbarState,
-    actionButtonClicked : () -> Unit,
-    backButtonClicked : ()->Unit
+    actionButtonClicked: () -> Unit,
+    backButtonClicked: () -> Unit
 ) {
     TopAppBar(
+
         navigationIcon = {
-            IconButton(onClick = {
-                backButtonClicked()
-            }) {
-                Icon(
-                    imageVector = Icons.Filled.ArrowBack,
-                    contentDescription = "Back",
-                    tint = Black
-                )
+            if (appBarState.showBackButton) {
+                IconButton(onClick = {
+                    backButtonClicked()
+                }) {
+                    Icon(
+                        imageVector = Icons.Filled.ArrowBack,
+                        contentDescription = "Back",
+                        tint = Black
+                    )
+                }
             }
         },
         title = {
@@ -48,19 +51,21 @@ fun GitaTopAppBar(
             )
         },
         actions = {
-            IconButton(
-                modifier = Modifier
-                    .padding(end = Dimensions.gitaPadding2x)
-                    .size(24.dp),
-                onClick = {
-                    actionButtonClicked()
-                }) {
-                Icon(
-                    imageVector = Icons.Filled.Settings,
-                    contentDescription = "Back",
-                    tint = Black
+            if(appBarState.showActionButton) {
+                IconButton(
+                    modifier = Modifier
+                        .padding(end = Dimensions.gitaPadding2x)
+                        .size(24.dp),
+                    onClick = {
+                        actionButtonClicked()
+                    }) {
+                    Icon(
+                        imageVector = Icons.Filled.Settings,
+                        contentDescription = "Settings",
+                        tint = Black
 
-                )
+                    )
+                }
             }
         }
     )

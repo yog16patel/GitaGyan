@@ -16,6 +16,7 @@
     <string name="chapter">अध्याय</string>
     <string name="slok">श्लोक</string>
     <string name="select_slok">श्लोक चयन करे</string>
+    <string name="select_chapter">अध्याय चयन करे</string>
     <string name="continue_reading">पढ़ना जारी राखे</string>
     <string name="chapters">अध्याय %s</string>
     <string name="slok_name">श्लोक %s</string>

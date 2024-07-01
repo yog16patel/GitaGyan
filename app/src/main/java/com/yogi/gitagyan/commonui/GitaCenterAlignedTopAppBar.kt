@@ -17,8 +17,7 @@ import com.yogi.gitagyan.ui.theme.Black
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun GitaCenterAlignedTopAppBar(
-    appBarState: AppbarState,
-    showActionButton: Boolean = false,
+    appBarState: AppbarState = AppbarState(),
     backButtonClicked : ()->Unit,
     actionButtonClicked: () -> Unit = {}
 ) {
@@ -31,18 +30,20 @@ fun GitaCenterAlignedTopAppBar(
             )
         },
         navigationIcon = {
-            IconButton(onClick = {
-                backButtonClicked()
-            }) {
-                Icon(
-                    imageVector = Icons.Filled.ArrowBack,
-                    contentDescription = "Back",
-                    tint = Black
-                )
+            if(appBarState.showBackButton) {
+                IconButton(onClick = {
+                    backButtonClicked()
+                }) {
+                    Icon(
+                        imageVector = Icons.Filled.ArrowBack,
+                        contentDescription = "Back",
+                        tint = Black
+                    )
+                }
             }
         },
         actions = {
-            if(showActionButton) {
+            if(appBarState.showBackButton) {
                 IconButton(onClick = {
                     actionButtonClicked()
                 }) {
