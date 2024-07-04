@@ -12,7 +12,6 @@ import com.yogi.domain.interactors.GetNumberOfSlokaInteractor
 import com.yogi.domain.interactors.SetLastReadSlokaAndChapterIndexValueInteractor
 import com.yogi.domain.interactors.SetLastReadSlokaAndChapterNameInteractor
 import com.yogi.domain.models.ChapterDetailItem
-import com.yogi.domain.models.ChapterInfoItem
 import com.yogi.gitagyan.base.PageState
 import com.yogi.gitagyan.ui.chapterlist.ChapterListPageData
 import com.yogi.gitagyan.ui.mappers.toChapterDetailItemUi
@@ -23,7 +22,6 @@ import com.yogi.gitagyan.ui.util.mapToSlokaNumberWithTheAppSlokaIndex
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -156,14 +154,6 @@ class GitaGyanViewModel @Inject constructor(
         _slokaDetailsPageState.value = _slokaDetailsPageState.value
             .copy(
                 isDetailOpen = false,
-                lastSelectedSloka = _slokaDetailsPageState.value.lastSelectedSloka
-            )
-    }
-
-    fun openDetailScreen() {
-        _slokaDetailsPageState.value = _slokaDetailsPageState.value
-            .copy(
-                isDetailOpen = true,
                 lastSelectedSloka = _slokaDetailsPageState.value.lastSelectedSloka
             )
     }

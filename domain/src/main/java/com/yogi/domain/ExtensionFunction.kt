@@ -1,7 +1,6 @@
 package com.yogi.domain
 
 import com.yogi.domain.core.GitaPair
-import java.lang.System.Logger
 
 fun String?.toPair(): GitaPair<String, String> {
     val index = this?.indexOf(",")?: return defaultGitaPair
