@@ -10,7 +10,11 @@ class GetLastReadSlokaAndChapterNameInteractor @Inject constructor(
     private val sharedPreferencesRepository: SharedPreferencesRepository,
 ) : ResultInteractor<Unit, GitaPair<String,String>> (){
     override suspend fun doWork(params: Unit): GitaPair<String, String> {
-        return sharedPreferencesRepository.getSaveLastReadSlokMap().toPair()
+        return try {
+            sharedPreferencesRepository.getSaveLastReadSlokMap().toPair()
+        }catch (e: Exception) {
+            GitaPair("1","1")
+        }
     }
 }
 

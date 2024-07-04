@@ -17,6 +17,7 @@ import com.yogi.gitagyan.ui.util.GitaContentType
 fun ChapterOverviewScreen(
     viewModel: GitaGyanViewModel,
     contentType: GitaContentType,
+    selectedChapter:Int,
     displayFeatures: List<DisplayFeature>,
     closeDetailScreen: () -> Unit,
     goBack: () -> Unit,
@@ -24,7 +25,10 @@ fun ChapterOverviewScreen(
 ) {
 
     val slokaDetailsPageState by viewModel.slokaDetailsPageState.collectAsState()
-    val chapterListPageState by viewModel.chapterListPageState.collectAsState()
+    var chapter by remember(selectedChapter) {
+        mutableStateOf(selectedChapter)
+    }
+
     /**
      * When moving from LIST_AND_DETAIL page to LIST page clear the selection and user should see LIST screen.
      */
@@ -42,11 +46,12 @@ fun ChapterOverviewScreen(
         GotoItemComposableDialog(
             title = stringResource(id = R.string.select_chapter),
             listNumbers = (1..18).toList(),
-            selectedNumber = chapterListPageState.selectedChapter,
+            selectedNumber = chapter,
             showDialog = showSelectChapterDialog,
             onDismiss = { showSelectChapterDialog = false },
-            onItemSelected = {  chNumber->
-                viewModel.updateSelectedChapter(chNumber)
+            onItemSelected = {  chNumber ->
+                chapter = chNumber
+                viewModel.updateSelectedChapter(chapter)
                 viewModel.setLastSelectedSloka(1, contentType = GitaContentType.NONE)
                 showSelectChapterDialog = false
             })
@@ -65,16 +70,16 @@ fun ChapterOverviewScreen(
                 actionButtonClicked = {
                     showSelectChapterDialog = true
                 },
-                showPrevious = chapterListPageState.selectedChapter > 1,
-                showNext = chapterListPageState.selectedChapter < 18,
+                showPrevious = chapter > 1,
+                showNext = chapter < 18,
                 nextClicked = {
-                    val chNumber = chapterListPageState.selectedChapter + 1
-                    viewModel.updateSelectedChapter(chNumber)
+                   chapter += 1
+                    viewModel.updateSelectedChapter(chapter)
                     viewModel.setLastSelectedSloka(1, contentType = GitaContentType.NONE)
                 },
                 prevClicked =  {
-                    val chNumber = chapterListPageState.selectedChapter - 1
-                    viewModel.updateSelectedChapter(chNumber)
+                    chapter -= 1
+                    viewModel.updateSelectedChapter(chapter)
                     viewModel.setLastSelectedSloka(1, contentType = GitaContentType.NONE)
 
                 }

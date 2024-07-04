@@ -1,5 +1,6 @@
 package com.yogi.data.repository
 
+import com.yogi.data.util.NetworkUtility
 import com.yogi.domain.core.Result
 import com.yogi.domain.firebase.FirebaseDatabaseInterface
 import com.yogi.domain.entities.PreferredLanguage
@@ -14,10 +15,12 @@ import javax.inject.Inject
 
 class GitaGyanRepositoryImpl @Inject constructor(
     private val firebaseDatabase: FirebaseDatabaseInterface,
-    private val sharedPreferencesRepository: SharedPreferencesRepository
+    private val sharedPreferencesRepository: SharedPreferencesRepository,
+    private val networkUtility: NetworkUtility
 ) : GitaGyanRepository {
     override suspend fun getChapterList(): Result<List<ChapterInfoItem>> {
         return try {
+            if(!networkUtility.isNetworkAvailable()) return Result.Error("No Internet")
             val lang = sharedPreferencesRepository.getLanguageFromSharedPref()?.languageName   ?: PreferredLanguage.ENGLISH.languageName
             val response = firebaseDatabase.getChapterList(
                 language = lang,

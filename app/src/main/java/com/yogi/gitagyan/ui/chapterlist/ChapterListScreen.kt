@@ -24,6 +24,7 @@ import com.yogi.gitagyan.commonui.GitaAlertDialogNew
 import com.yogi.gitagyan.commonui.ImageBorderAnimation
 import com.yogi.domain.entities.PreferredLanguage
 import com.yogi.gitagyan.LanguageState
+import com.yogi.gitagyan.base.PageState
 import com.yogi.gitagyan.commonui.GitaTopAppBar
 import com.yogi.gitagyan.ui.appbar.AppbarState
 
@@ -50,40 +51,59 @@ private fun ChapterList(
 ) {
     val chaptersState by viewModel.chapterListPageState.collectAsState()
     //viewModel.getLanguagePreference()
-    if (chaptersState.isLoading) ImageBorderAnimation()
-    else {
-        val languageState by viewModel.languageState.collectAsState()
-        val appbarState by remember {
-            mutableStateOf(AppbarState())
-        }
-
-        val title =
-            if (languageState.preferredLanguage == PreferredLanguage.ENGLISH) stringResource(
-                id = R.string.chapters, ""
+    when (val state = chaptersState) {
+        is PageState.Error -> TODO()
+        PageState.Loading -> ImageBorderAnimation()
+        is PageState.Success -> {
+            val languageState by viewModel.languageState.collectAsState()
+            SuccessChapterList(
+                languageState = languageState,
+                chaptersState = state.data,
+                onBackButtonPressed = onBackButtonPressed,
+                selectedChapter = {
+                    viewModel.updateSelectedChapter(it)
+                    navigateToNext(it, 1)
+                }
             )
-            else stringResource(id = R.string.chapters_hindi)
-        appbarState.title = title
-
-        ChapterList(
-            chapterListPageState = chaptersState,
-            languageState = languageState,
-            appbarState = appbarState,
-            onBackButtonPressed = onBackButtonPressed,
-            selectedLanguage = {
-                //viewModel.setLanguagePreferences(it)
-            },
-            selectedChapter = {
-                viewModel.updateSelectedChapter(it)
-                navigateToNext(it, 1)
-            }
-        )
+        }
     }
+}
+
+@Composable
+fun SuccessChapterList(
+    languageState: LanguageState,
+    chaptersState: ChapterListPageData,
+    onBackButtonPressed: () -> Unit,
+    selectedChapter: (Int) -> Unit
+) {
+
+    val appbarState by remember {
+        mutableStateOf(AppbarState())
+    }
+
+    val title =
+        if (languageState.preferredLanguage == PreferredLanguage.ENGLISH) stringResource(
+            id = R.string.chapters, ""
+        )
+        else stringResource(id = R.string.chapters_hindi)
+    appbarState.title = title
+
+    ChapterList(
+        chapterListPageState = chaptersState,
+        languageState = languageState,
+        appbarState = appbarState,
+        onBackButtonPressed = onBackButtonPressed,
+        selectedLanguage = {
+            //viewModel.setLanguagePreferences(it)
+        },
+        selectedChapter = selectedChapter
+    )
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun ChapterList(
-    chapterListPageState: ChapterListPageState,
+    chapterListPageState: ChapterListPageData,
     languageState: LanguageState,
     appbarState: AppbarState,
     selectedLanguage: (PreferredLanguage) -> Unit,

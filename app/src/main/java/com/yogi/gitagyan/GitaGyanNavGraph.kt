@@ -77,6 +77,7 @@ fun GitaGyanNavGraph(
                 viewModel = viewModel,
                 contentType = contentType,
                 displayFeatures = displayFeatures,
+                selectedChapter = chNumber.toInt(),
                 goBack = {
                     appState.navController.popBackStack()
                 },
