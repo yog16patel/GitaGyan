@@ -1,11 +1,11 @@
 package com.yogi.domain
 
-import com.yogi.domain.core.GitaPair
+import com.yogi.data.core.GitaPair
 
 fun String?.toPair(): GitaPair<String, String> {
     val index = this?.indexOf(",")?: return defaultGitaPair
     if(index < 0) return defaultGitaPair
-    println("Yogesh: $this")
+
     val first = this.substring(0, index-1)
     val second = this.substring(index + 1, this.length)
 

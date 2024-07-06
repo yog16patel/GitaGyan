@@ -3,9 +3,8 @@ package com.yogi.data.firebase
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ktx.getValue
 import com.yogi.data.extensions.await
-import com.yogi.domain.firebase.FirebaseDatabaseInterface
-import com.yogi.domain.entities.ChapterDetailItemEntity
-import com.yogi.domain.entities.ChapterInfoItemEntity
+import com.yogi.data.entities.ChapterDetailItemEntity
+import com.yogi.data.entities.ChapterInfoItemEntity
 import javax.inject.Inject
 
 class FirebaseDatabaseImpl @Inject constructor(

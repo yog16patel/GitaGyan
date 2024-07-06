@@ -1,4 +1,4 @@
-package com.yogi.domain.entities
+package com.yogi.data.entities
 
 data class SlokEntity(
     val slokaNumber: String = "",

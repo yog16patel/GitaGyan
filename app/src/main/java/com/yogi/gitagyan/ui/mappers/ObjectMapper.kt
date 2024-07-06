@@ -1,8 +1,8 @@
 package com.yogi.gitagyan.ui.mappers
 
-import com.yogi.domain.models.ChapterDetailItem
-import com.yogi.domain.models.ChapterInfoItem
-import com.yogi.domain.models.Slok
+import com.yogi.data.models.ChapterDetailItem
+import com.yogi.data.models.ChapterInfoItem
+import com.yogi.data.models.Slok
 import com.yogi.gitagyan.models.ChapterDetailItemUi
 import com.yogi.gitagyan.models.ChapterInfoItemUi
 import com.yogi.gitagyan.models.SlokUi

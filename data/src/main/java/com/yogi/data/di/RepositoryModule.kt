@@ -3,9 +3,9 @@ package com.yogi.data.di
 import com.yogi.data.repository.GitaGyanRepositoryImpl
 import com.yogi.data.repository.QodRepositoryImpl
 import com.yogi.data.repository.SharedPreferencesRepositoryImpl
-import com.yogi.domain.repository.GitaGyanRepository
-import com.yogi.domain.repository.QODRepository
-import com.yogi.domain.repository.SharedPreferencesRepository
+import com.yogi.data.repository.GitaGyanRepository
+import com.yogi.data.repository.QODRepository
+import com.yogi.data.repository.SharedPreferencesRepository
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn

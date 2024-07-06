@@ -1,4 +1,4 @@
-package com.yogi.domain.repository
+package com.yogi.data.repository
 
 interface QODRepository {
     fun getQOD(): String?

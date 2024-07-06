@@ -1,17 +1,16 @@
 package com.yogi.gitagyan.ui.slokadetails
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.yogi.domain.core.GitaPair
-import com.yogi.domain.core.Result
+import com.yogi.data.core.GitaPair
+import com.yogi.data.core.Result
+import com.yogi.data.models.ChapterDetailItem
 import com.yogi.domain.interactors.GetChapterListInteractor
 import com.yogi.domain.interactors.GetSlokaDetailsInteractor
 import com.yogi.gitagyan.LanguageState
 import com.yogi.domain.interactors.GetNumberOfSlokaInteractor
 import com.yogi.domain.interactors.SetLastReadSlokaAndChapterIndexValueInteractor
 import com.yogi.domain.interactors.SetLastReadSlokaAndChapterNameInteractor
-import com.yogi.domain.models.ChapterDetailItem
 import com.yogi.gitagyan.base.PageState
 import com.yogi.gitagyan.ui.chapterlist.ChapterListPageData
 import com.yogi.gitagyan.ui.mappers.toChapterDetailItemUi

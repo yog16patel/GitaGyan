@@ -1,8 +1,7 @@
 package com.yogi.data.repository
 
 import android.content.SharedPreferences
-import com.yogi.domain.entities.PreferredLanguage
-import com.yogi.domain.repository.SharedPreferencesRepository
+import com.yogi.data.entities.PreferredLanguage
 import javax.inject.Inject
 import javax.inject.Singleton
 

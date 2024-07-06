@@ -1,6 +1,7 @@
-package com.yogi.domain.repository
+package com.yogi.data.repository
 
-import com.yogi.domain.entities.PreferredLanguage
+import com.yogi.data.entities.PreferredLanguage
+
 
 interface SharedPreferencesRepository {
 

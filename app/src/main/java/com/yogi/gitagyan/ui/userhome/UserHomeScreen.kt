@@ -30,7 +30,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.yogi.domain.entities.PreferredLanguage
+import com.yogi.data.entities.PreferredLanguage
 import com.yogi.gitagyan.commonui.TextComponent
 import com.yogi.gitagyan.ui.theme.Background
 import com.yogi.gitagyan.ui.theme.Dimensions.gitaPadding

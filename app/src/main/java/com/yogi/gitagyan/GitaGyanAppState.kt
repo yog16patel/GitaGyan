@@ -34,10 +34,8 @@ class GitaGyanAppState(
 ) {
 
     fun navigateToUserHome(from: NavBackStackEntry,builder: NavOptionsBuilder.() -> Unit = {  } ){
-        if(from.lifecycleIsResumed()){
-            navController.navigate(Screen.UserHomeScreen.route){
-                builder.invoke(this)
-            }
+        navController.navigate(Screen.UserHomeScreen.route){
+            builder.invoke(this)
         }
     }
 

@@ -1,4 +1,4 @@
-package com.yogi.domain.entities
+package com.yogi.data.entities
 
 
 enum class PreferredLanguage(val languageName: String, val languageCode: String, val index: Int) {
@@ -17,7 +17,7 @@ enum class PreferredLanguage(val languageName: String, val languageCode: String,
                 it.languageCode == value
             } ?: ENGLISH
         }
-        fun languageNameToEnum(languageName: String?): PreferredLanguage{
+        fun languageNameToEnum(languageName: String?): PreferredLanguage {
             return values().find {
                 it.languageName == languageName
             } ?: ENGLISH

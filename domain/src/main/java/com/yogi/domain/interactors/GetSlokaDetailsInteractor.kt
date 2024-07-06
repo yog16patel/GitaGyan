@@ -1,9 +1,9 @@
 package com.yogi.domain.interactors
 
-import com.yogi.domain.core.Result
-import com.yogi.domain.core.ResultInteractor
-import com.yogi.domain.models.ChapterDetailItem
-import com.yogi.domain.repository.GitaGyanRepository
+import com.yogi.data.core.ResultInteractor
+import com.yogi.data.models.ChapterDetailItem
+import com.yogi.data.repository.GitaGyanRepository
+import com.yogi.data.core.Result
 import javax.inject.Inject
 
 class GetSlokaDetailsInteractor @Inject constructor(

@@ -1,8 +1,8 @@
 package com.yogi.domain.interactors
 
-import com.yogi.domain.core.GitaPair
-import com.yogi.domain.core.ResultInteractor
-import com.yogi.domain.repository.SharedPreferencesRepository
+import com.yogi.data.core.GitaPair
+import com.yogi.data.core.ResultInteractor
+import com.yogi.data.repository.SharedPreferencesRepository
 import javax.inject.Inject
 
 class SetLastReadSlokaAndChapterIndexValueInteractor@Inject constructor(

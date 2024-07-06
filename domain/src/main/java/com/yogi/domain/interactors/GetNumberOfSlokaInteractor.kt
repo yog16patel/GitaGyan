@@ -1,7 +1,8 @@
 package com.yogi.domain.interactors
 
-import com.yogi.domain.core.ResultInteractor
-import com.yogi.domain.repository.GitaGyanRepository
+
+import com.yogi.data.core.ResultInteractor
+import com.yogi.data.repository.GitaGyanRepository
 import javax.inject.Inject
 
 class GetNumberOfSlokaInteractor @Inject constructor(

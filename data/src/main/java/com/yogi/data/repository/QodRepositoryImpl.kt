@@ -1,7 +1,5 @@
 package com.yogi.data.repository
 
-import android.util.Log
-import com.yogi.domain.repository.QODRepository
 import javax.inject.Inject
 
 class QodRepositoryImpl @Inject constructor(): QODRepository {

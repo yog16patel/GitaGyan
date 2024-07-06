@@ -1,7 +1,7 @@
 package com.yogi.domain.interactors
 
-import com.yogi.domain.core.ResultInteractor
-import com.yogi.domain.repository.QODRepository
+import com.yogi.data.core.ResultInteractor
+import com.yogi.data.repository.QODRepository
 import javax.inject.Inject
 
 class QODInteractor @Inject constructor(

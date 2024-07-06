@@ -1,17 +1,15 @@
 package com.yogi.data.repository
 
+import com.yogi.data.firebase.FirebaseDatabaseInterface
+import com.yogi.data.models.ChapterInfoItem
 import com.yogi.data.util.NetworkUtility
-import com.yogi.domain.core.Result
-import com.yogi.domain.firebase.FirebaseDatabaseInterface
-import com.yogi.domain.entities.PreferredLanguage
-import com.yogi.domain.localinfo.slokaNumberInChapterMap
-import com.yogi.domain.models.ChapterDetailItem
-import com.yogi.domain.models.ChapterInfoItem
-import com.yogi.domain.models.Slok
-import com.yogi.domain.repository.GitaGyanRepository
-import com.yogi.domain.repository.SharedPreferencesRepository
 import java.lang.Exception
 import javax.inject.Inject
+import com.yogi.data.core.Result
+import com.yogi.data.models.ChapterDetailItem
+import com.yogi.data.models.Slok
+import com.yogi.data.entities.PreferredLanguage
+import com.yogi.domain.localinfo.slokaNumberInChapterMap
 
 class GitaGyanRepositoryImpl @Inject constructor(
     private val firebaseDatabase: FirebaseDatabaseInterface,

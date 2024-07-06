@@ -2,10 +2,11 @@ package com.yogi.gitagyan.ui.userhome
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.yogi.domain.entities.PreferredLanguage
+import com.yogi.data.entities.PreferredLanguage
+import com.yogi.data.repository.SharedPreferencesRepository
 import com.yogi.domain.interactors.GetCurrentStateInteractor
 import com.yogi.domain.interactors.QODInteractor
-import com.yogi.domain.repository.SharedPreferencesRepository
+
 import com.yogi.gitagyan.LanguageChangeUtil
 import com.yogi.gitagyan.LanguageState
 import com.yogi.gitagyan.ui.CurrentState

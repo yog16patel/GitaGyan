@@ -1,8 +1,8 @@
-package com.yogi.domain.repository
+package com.yogi.data.repository
 
-import com.yogi.domain.core.Result
-import com.yogi.domain.models.ChapterDetailItem
-import com.yogi.domain.models.ChapterInfoItem
+import com.yogi.data.models.ChapterDetailItem
+import com.yogi.data.models.ChapterInfoItem
+import com.yogi.data.core.Result
 
 interface GitaGyanRepository {
     suspend fun getChapterList(): Result<List<ChapterInfoItem>>

@@ -2,7 +2,7 @@ package com.yogi.gitagyan
 
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.os.LocaleListCompat
-import com.yogi.domain.entities.PreferredLanguage
+import com.yogi.data.entities.PreferredLanguage
 
 object LanguageChangeUtil {
     fun applyLanguage(

@@ -1,7 +1,7 @@
 package com.yogi.data.di
 
 import com.yogi.data.firebase.FirebaseDatabaseImpl
-import com.yogi.domain.firebase.FirebaseDatabaseInterface
+import com.yogi.data.firebase.FirebaseDatabaseInterface
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn

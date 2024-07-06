@@ -1,6 +1,6 @@
 package com.yogi.domain.interactors
 
-import com.yogi.domain.core.ResultInteractor
+import com.yogi.data.core.ResultInteractor
 import com.yogi.domain.localinfo.slokaNumberInChapterMap
 import com.yogi.domain.localinfo.totalSlok
 import javax.inject.Inject

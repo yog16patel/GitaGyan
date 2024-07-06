@@ -22,7 +22,7 @@ import com.yogi.gitagyan.R
 import com.yogi.gitagyan.commonui.ChooseLanguageDialogUi
 import com.yogi.gitagyan.commonui.GitaAlertDialogNew
 import com.yogi.gitagyan.commonui.ImageBorderAnimation
-import com.yogi.domain.entities.PreferredLanguage
+import com.yogi.data.entities.PreferredLanguage
 import com.yogi.gitagyan.LanguageState
 import com.yogi.gitagyan.base.PageState
 import com.yogi.gitagyan.commonui.GitaTopAppBar

@@ -187,14 +187,13 @@ private fun SlokaDetailLayout(
     currentIndex: Int,
     sloka: SlokUi
 ) {
-    val pagerState = rememberPagerState()
+    val pagerState = rememberPagerState(pageCount = { pageCount })
     LaunchedEffect(key1 = currentIndex) {
         pagerState.animateScrollToPage(currentIndex)
 
     }
 
     HorizontalPager(
-        pageCount = pageCount,
         state = pagerState
     ) { page ->
         SlokaComposable(

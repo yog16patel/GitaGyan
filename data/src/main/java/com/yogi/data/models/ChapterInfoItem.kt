@@ -1,4 +1,4 @@
-package com.yogi.domain.models
+package com.yogi.data.models
 
 data class ChapterInfoItem(
     val chapterNumber: String = "",

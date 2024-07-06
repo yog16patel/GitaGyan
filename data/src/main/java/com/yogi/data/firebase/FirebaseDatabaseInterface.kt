@@ -1,7 +1,7 @@
-package com.yogi.domain.firebase
+package com.yogi.data.firebase
 
-import com.yogi.domain.entities.ChapterDetailItemEntity
-import com.yogi.domain.entities.ChapterInfoItemEntity
+import com.yogi.data.entities.ChapterDetailItemEntity
+import com.yogi.data.entities.ChapterInfoItemEntity
 
 interface FirebaseDatabaseInterface {
     suspend fun getChapterList(language: String): List<ChapterInfoItemEntity>?

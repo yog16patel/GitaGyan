@@ -1,4 +1,4 @@
-package com.yogi.domain.core
+package com.yogi.data.core
 
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
